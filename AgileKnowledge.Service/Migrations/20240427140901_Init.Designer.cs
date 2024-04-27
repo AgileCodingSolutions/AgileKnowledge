@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace AgileKnowledge.Service.Migrations
 {
     [DbContext(typeof(KnowledgeDbContext))]
-    [Migration("20240427125655_Init")]
+    [Migration("20240427140901_Init")]
     partial class Init
     {
         /// <inheritdoc />
@@ -85,7 +85,7 @@ namespace AgileKnowledge.Service.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("knowledge-chat-application", (string)null);
+                    b.ToTable("Application", "chat");
                 });
 
             modelBuilder.Entity("AgileKnowledge.Service.Domain.Enities.ChatDialog", b =>
@@ -132,7 +132,7 @@ namespace AgileKnowledge.Service.Migrations
 
                     b.HasIndex("ChatApplicationId");
 
-                    b.ToTable("knowledge-chat-dialog", (string)null);
+                    b.ToTable("Dialog", "chat");
                 });
 
             modelBuilder.Entity("AgileKnowledge.Service.Domain.Enities.ChatDialogHistory", b =>
@@ -180,7 +180,7 @@ namespace AgileKnowledge.Service.Migrations
 
                     b.HasIndex("ChatDialogId");
 
-                    b.ToTable("knowledge-chat-dialog-history", (string)null);
+                    b.ToTable("DialogHistory", "chat");
                 });
 
             modelBuilder.Entity("AgileKnowledge.Service.Domain.Enities.FileStorage", b =>
@@ -233,7 +233,7 @@ namespace AgileKnowledge.Service.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("knowledge-file-storages", (string)null);
+                    b.ToTable("FileStorages", (string)null);
                 });
 
             modelBuilder.Entity("AgileKnowledge.Service.Domain.Enities.KnowledgeBase", b =>
@@ -282,7 +282,7 @@ namespace AgileKnowledge.Service.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("knowledge-knowledge-base", (string)null);
+                    b.ToTable("Base", "knowledge");
                 });
 
             modelBuilder.Entity("AgileKnowledge.Service.Domain.Enities.KnowledgeBaseDetails", b =>
@@ -346,7 +346,7 @@ namespace AgileKnowledge.Service.Migrations
 
                     b.HasIndex("KnowledgeBaseId");
 
-                    b.ToTable("knowledge-knowledge-base-details", (string)null);
+                    b.ToTable("Details", "knowledge");
                 });
 
             modelBuilder.Entity("AgileKnowledge.Service.Domain.Enities.User", b =>
@@ -417,7 +417,7 @@ namespace AgileKnowledge.Service.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("knowledge-users", (string)null);
+                    b.ToTable("Users", (string)null);
                 });
 
             modelBuilder.Entity("ChatApplicationKnowledgeBase", b =>

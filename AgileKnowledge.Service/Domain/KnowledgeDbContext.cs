@@ -31,9 +31,10 @@ namespace AgileKnowledge.Service.Domain
 
 		protected override void OnModelCreating(ModelBuilder modelBuilder)
 		{
+
 			modelBuilder.Entity<User>(entity =>
 			{
-				entity.ToTable("knowledge-users");
+				entity.ToTable("Users");
 				entity.HasKey(e => e.Id);
 				entity.Property(e => e.Id).ValueGeneratedOnAdd();
 
@@ -50,7 +51,7 @@ namespace AgileKnowledge.Service.Domain
 
 			modelBuilder.Entity<FileStorage>(entity =>
 			{
-				entity.ToTable("knowledge-file-storages");
+				entity.ToTable("FileStorages");
 				entity.HasKey(e => e.Id);
 				entity.Property(e => e.Id).ValueGeneratedOnAdd();
 
@@ -63,7 +64,7 @@ namespace AgileKnowledge.Service.Domain
 
 			modelBuilder.Entity<KnowledgeBase>(entity =>
 			{
-				entity.ToTable("knowledge-knowledge-base");
+				entity.ToTable("Base","knowledge");
 				entity.HasKey(e => e.Id);
 				entity.Property(e => e.Id).ValueGeneratedOnAdd();
 
@@ -77,7 +78,7 @@ namespace AgileKnowledge.Service.Domain
 
 			modelBuilder.Entity<KnowledgeBaseDetails>(entity =>
 			{
-				entity.ToTable("knowledge-knowledge-base-details");
+				entity.ToTable("Details","knowledge");
 				entity.HasKey(e => e.Id);
 				entity.Property(e => e.Id).ValueGeneratedOnAdd();
 
@@ -95,7 +96,7 @@ namespace AgileKnowledge.Service.Domain
 
 			modelBuilder.Entity<ChatApplication>(entity =>
 			{
-				entity.ToTable("knowledge-chat-application");
+				entity.ToTable("Application","chat");
 				entity.HasKey(e => e.Id);
 				entity.Property(e => e.Id).ValueGeneratedOnAdd();
 
@@ -114,7 +115,7 @@ namespace AgileKnowledge.Service.Domain
 
 			modelBuilder.Entity<ChatDialog>(entity =>
 			{
-				entity.ToTable("knowledge-chat-dialog");
+				entity.ToTable("Dialog","chat");
 				entity.HasKey(e => e.Id);
 				entity.Property(e => e.Id).ValueGeneratedOnAdd();
 
@@ -127,7 +128,7 @@ namespace AgileKnowledge.Service.Domain
 
 			modelBuilder.Entity<ChatDialogHistory>(entity =>
 			{
-				entity.ToTable("knowledge-chat-dialog-history");
+				entity.ToTable("DialogHistory","chat");
 				entity.HasKey(e => e.Id);
 				entity.Property(e => e.Id).ValueGeneratedOnAdd();
 

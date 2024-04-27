@@ -11,8 +11,15 @@ namespace AgileKnowledge.Service.Migrations
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.EnsureSchema(
+                name: "chat");
+
+            migrationBuilder.EnsureSchema(
+                name: "knowledge");
+
             migrationBuilder.CreateTable(
-                name: "knowledge-chat-application",
+                name: "Application",
+                schema: "chat",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
@@ -33,11 +40,34 @@ namespace AgileKnowledge.Service.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_knowledge-chat-application", x => x.Id);
+                    table.PrimaryKey("PK_Application", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
-                name: "knowledge-file-storages",
+                name: "Base",
+                schema: "knowledge",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    Icon = table.Column<string>(type: "character varying(2048)", maxLength: 2048, nullable: false),
+                    Name = table.Column<string>(type: "character varying(128)", maxLength: 128, nullable: false),
+                    Model = table.Column<string>(type: "text", nullable: true),
+                    EmbeddingModel = table.Column<string>(type: "text", nullable: false),
+                    CreationTime = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    CreatorId = table.Column<Guid>(type: "uuid", nullable: true),
+                    LastModificationTime = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    LastModifierId = table.Column<Guid>(type: "uuid", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "boolean", nullable: false),
+                    DeletionTime = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    DeleterUserId = table.Column<Guid>(type: "uuid", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Base", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "FileStorages",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
@@ -56,33 +86,11 @@ namespace AgileKnowledge.Service.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_knowledge-file-storages", x => x.Id);
+                    table.PrimaryKey("PK_FileStorages", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
-                name: "knowledge-knowledge-base",
-                columns: table => new
-                {
-                    Id = table.Column<Guid>(type: "uuid", nullable: false),
-                    Icon = table.Column<string>(type: "character varying(2048)", maxLength: 2048, nullable: false),
-                    Name = table.Column<string>(type: "character varying(128)", maxLength: 128, nullable: false),
-                    Model = table.Column<string>(type: "text", nullable: true),
-                    EmbeddingModel = table.Column<string>(type: "text", nullable: false),
-                    CreationTime = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    CreatorId = table.Column<Guid>(type: "uuid", nullable: true),
-                    LastModificationTime = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
-                    LastModifierId = table.Column<Guid>(type: "uuid", nullable: true),
-                    IsDeleted = table.Column<bool>(type: "boolean", nullable: false),
-                    DeletionTime = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
-                    DeleterUserId = table.Column<Guid>(type: "uuid", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_knowledge-knowledge-base", x => x.Id);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "knowledge-users",
+                name: "Users",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
@@ -105,11 +113,12 @@ namespace AgileKnowledge.Service.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_knowledge-users", x => x.Id);
+                    table.PrimaryKey("PK_Users", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
-                name: "knowledge-chat-dialog",
+                name: "Dialog",
+                schema: "chat",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
@@ -126,17 +135,18 @@ namespace AgileKnowledge.Service.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_knowledge-chat-dialog", x => x.Id);
+                    table.PrimaryKey("PK_Dialog", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_knowledge-chat-dialog_knowledge-chat-application_ChatApplic~",
+                        name: "FK_Dialog_Application_ChatApplicationId",
                         column: x => x.ChatApplicationId,
-                        principalTable: "knowledge-chat-application",
+                        principalSchema: "chat",
+                        principalTable: "Application",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
-                name: "ChatApplicationKnowledgeBase",
+                name: "ChatApplicationKnowledgeBase",schema: "chat",
                 columns: table => new
                 {
                     ChatApplicationId = table.Column<Guid>(type: "uuid", nullable: false),
@@ -146,21 +156,24 @@ namespace AgileKnowledge.Service.Migrations
                 {
                     table.PrimaryKey("PK_ChatApplicationKnowledgeBase", x => new { x.ChatApplicationId, x.KnowledgeBasesId });
                     table.ForeignKey(
-                        name: "FK_ChatApplicationKnowledgeBase_knowledge-chat-application_Cha~",
+                        name: "FK_ChatApplicationKnowledgeBase_Application_ChatApplicationId",
                         column: x => x.ChatApplicationId,
-                        principalTable: "knowledge-chat-application",
+                        principalSchema: "chat",
+                        principalTable: "Application",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_ChatApplicationKnowledgeBase_knowledge-knowledge-base_Knowl~",
+                        name: "FK_ChatApplicationKnowledgeBase_Base_KnowledgeBasesId",
                         column: x => x.KnowledgeBasesId,
-                        principalTable: "knowledge-knowledge-base",
+                        principalSchema: "knowledge",
+                        principalTable: "Base",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
-                name: "knowledge-knowledge-base-details",
+                name: "Details",
+                schema: "knowledge",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
@@ -183,23 +196,25 @@ namespace AgileKnowledge.Service.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_knowledge-knowledge-base-details", x => x.Id);
+                    table.PrimaryKey("PK_Details", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_knowledge-knowledge-base-details_knowledge-file-storages_Fi~",
-                        column: x => x.FileId,
-                        principalTable: "knowledge-file-storages",
+                        name: "FK_Details_Base_KnowledgeBaseId",
+                        column: x => x.KnowledgeBaseId,
+                        principalSchema: "knowledge",
+                        principalTable: "Base",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_knowledge-knowledge-base-details_knowledge-knowledge-base_K~",
-                        column: x => x.KnowledgeBaseId,
-                        principalTable: "knowledge-knowledge-base",
+                        name: "FK_Details_FileStorages_FileId",
+                        column: x => x.FileId,
+                        principalTable: "FileStorages",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
-                name: "knowledge-chat-dialog-history",
+                name: "DialogHistory",
+                schema: "chat",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
@@ -217,67 +232,79 @@ namespace AgileKnowledge.Service.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_knowledge-chat-dialog-history", x => x.Id);
+                    table.PrimaryKey("PK_DialogHistory", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_knowledge-chat-dialog-history_knowledge-chat-dialog_ChatDia~",
+                        name: "FK_DialogHistory_Dialog_ChatDialogId",
                         column: x => x.ChatDialogId,
-                        principalTable: "knowledge-chat-dialog",
+                        principalSchema: "chat",
+                        principalTable: "Dialog",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateIndex(
                 name: "IX_ChatApplicationKnowledgeBase_KnowledgeBasesId",
+                schema: "chat",
                 table: "ChatApplicationKnowledgeBase",
                 column: "KnowledgeBasesId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_knowledge-chat-dialog_ChatApplicationId",
-                table: "knowledge-chat-dialog",
-                column: "ChatApplicationId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_knowledge-chat-dialog-history_ChatDialogId",
-                table: "knowledge-chat-dialog-history",
-                column: "ChatDialogId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_knowledge-knowledge-base-details_FileId",
-                table: "knowledge-knowledge-base-details",
+                name: "IX_Details_FileId",
+                schema: "knowledge",
+                table: "Details",
                 column: "FileId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_knowledge-knowledge-base-details_KnowledgeBaseId",
-                table: "knowledge-knowledge-base-details",
+                name: "IX_Details_KnowledgeBaseId",
+                schema: "knowledge",
+                table: "Details",
                 column: "KnowledgeBaseId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Dialog_ChatApplicationId",
+                schema: "chat",
+                table: "Dialog",
+                column: "ChatApplicationId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_DialogHistory_ChatDialogId",
+                schema: "chat",
+                table: "DialogHistory",
+                column: "ChatDialogId");
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "ChatApplicationKnowledgeBase");
+                name: "ChatApplicationKnowledgeBase",
+                schema: "chat");
 
             migrationBuilder.DropTable(
-                name: "knowledge-chat-dialog-history");
+                name: "Details",
+                schema: "knowledge");
 
             migrationBuilder.DropTable(
-                name: "knowledge-knowledge-base-details");
+                name: "DialogHistory",
+                schema: "chat");
 
             migrationBuilder.DropTable(
-                name: "knowledge-users");
+                name: "Users");
 
             migrationBuilder.DropTable(
-                name: "knowledge-chat-dialog");
+                name: "Base",
+                schema: "knowledge");
 
             migrationBuilder.DropTable(
-                name: "knowledge-file-storages");
+                name: "FileStorages");
 
             migrationBuilder.DropTable(
-                name: "knowledge-knowledge-base");
+                name: "Dialog",
+                schema: "chat");
 
             migrationBuilder.DropTable(
-                name: "knowledge-chat-application");
+                name: "Application",
+                schema: "chat");
         }
     }
 }
