@@ -21,5 +21,10 @@ namespace AgileKnowledge.Service.Domain.Enities
             Model = model;
             EmbeddingModel = embeddingModel;
         }
+
+
+
+
+
     }
 }

@@ -23,13 +23,13 @@ namespace AgileKnowledge.Service.Controllers
 	{
 		private readonly KnowledgeDbContext _dbContext;
 		private readonly IMapper _mapper;
-		private readonly JwtTokenProvider _jwyJwtTokenProvider;
+		private readonly JwtTokenProvider _jwtTokenProvider;
 
-		public UserController(KnowledgeDbContext dbContext, IMapper mapper, JwtTokenProvider jwyJwtTokenProvider)
+		public UserController(KnowledgeDbContext dbContext, IMapper mapper, JwtTokenProvider jwtTokenProvider)
 		{
 			_dbContext = dbContext;
 			_mapper = mapper;
-			_jwyJwtTokenProvider = jwyJwtTokenProvider;
+			_jwtTokenProvider = jwtTokenProvider;
 		}
 
 		[HttpGet]
@@ -84,7 +84,7 @@ namespace AgileKnowledge.Service.Controllers
 		public async Task<ResultDto> ChangePasswordAsync([FromBody] ChangePasswordInputDto input)
 		{
 
-			var entity = await _dbContext.Users.Where(x => x.Id == _jwyJwtTokenProvider.GetUserId()).FirstOrDefaultAsync();
+			var entity = await _dbContext.Users.Where(x => x.Id == _jwtTokenProvider.GetUserId()).FirstOrDefaultAsync();
 
 			if (!entity.CheckCipher(input.Password))
 			{
@@ -102,8 +102,8 @@ namespace AgileKnowledge.Service.Controllers
 		[HttpPut]
 		public async Task<ResultDto> DisableAsync([FromBody] DisableInputDto input)
 		{
-			if (input.Id == _jwyJwtTokenProvider.GetUserId())
-				throw new Exception("不能禁用自己");
+			if (input.Id == _jwtTokenProvider.GetUserId())
+				throw new Exception("You cannot disable yourself");
 
 			// 管理员不能禁用
 			await _dbContext.Users.Where(x => x.Id == input.Id && x.Role != RoleType.Admin)

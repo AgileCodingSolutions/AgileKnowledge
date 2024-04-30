@@ -20,7 +20,7 @@ namespace AgileKnowledge.Service.Domain
 
 
 		public DbSet<KnowledgeBase> KnowledgeBases { get; set; }
-		public DbSet<KnowledgeBaseDetails> KnowledgeBaseCategories { get; set; }
+		public DbSet<KnowledgeBaseDetails> KnowledgeBaseDetails { get; set; }
 
 
 		public DbSet<ChatApplication> ChatApplications { get; set; }

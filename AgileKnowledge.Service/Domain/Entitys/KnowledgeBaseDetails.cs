@@ -41,10 +41,14 @@ namespace AgileKnowledge.Service.Domain.Enities
         {
         }
 
-        public KnowledgeBaseDetails(FileStorage file)
+        public KnowledgeBaseDetails(FileStorage file,KnowledgeBase knowledgeBase)
         {
             DataCount = 0;
             State = KnowledgeBaseQuantizationState.None;
+
+
+            this.File = file;
+            this.KnowledgeBase = knowledgeBase;
         }
     }
 }
