@@ -1,6 +1,9 @@
 using AgileKnowledge.Service.Domain;
 using AgileKnowledge.Service.Helper;
+using AgileKnowledge.Service.Mappings;
 using AgileKnowledge.Service.Options;
+using AutoMapper;
+
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 
@@ -18,6 +21,19 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 
+#region AuthMapper
+
+var config = new MapperConfiguration(cfg =>
+{
+	cfg.AddProfile<KnowledgeMapperProfile>();
+});
+var mapper = config.CreateMapper();
+builder.Services.AddSingleton(mapper);
+
+#endregion
+
+
+
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddSingleton<JwtTokenProvider>();
 
@@ -25,8 +41,6 @@ builder.Services.AddSingleton<JwtTokenProvider>();
 
 builder.Services.AddDbContext<KnowledgeDbContext>(options =>
 	options.UseNpgsql(ConnectionStringsOptions.DefaultConnection));
-
-
 
 
 var app = builder.Build();

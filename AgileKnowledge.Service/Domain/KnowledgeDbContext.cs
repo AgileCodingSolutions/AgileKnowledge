@@ -165,7 +165,7 @@ namespace AgileKnowledge.Service.Domain
 
 			foreach (var entityEntry in addedEntities)
 			{
-				((FullAuditedEntity)entityEntry.Entity).CreationTime = DateTime.Now;
+				((FullAuditedEntity)entityEntry.Entity).CreationTime = DateTime.Now.ToUniversalTime();
 				((FullAuditedEntity)entityEntry.Entity).CreatorId = _jwtTokenProvider.GetUserId();
 			}
 
@@ -174,7 +174,7 @@ namespace AgileKnowledge.Service.Domain
 
 			foreach (var entityEntry in modifiedEntities)
 			{
-				((FullAuditedEntity)entityEntry.Entity).LastModificationTime = DateTime.Now;
+				((FullAuditedEntity)entityEntry.Entity).LastModificationTime = DateTime.Now.ToUniversalTime();
 				((FullAuditedEntity)entityEntry.Entity).LastModifierId = _jwtTokenProvider.GetUserId();
 			}
 
@@ -185,7 +185,7 @@ namespace AgileKnowledge.Service.Domain
 			{
 				entityEntry.State = EntityState.Modified;
 
-				((FullAuditedEntity)entityEntry.Entity).DeletionTime = DateTime.Now;
+				((FullAuditedEntity)entityEntry.Entity).DeletionTime = DateTime.Now.ToUniversalTime();
 				((FullAuditedEntity)entityEntry.Entity).DeleterUserId = _jwtTokenProvider.GetUserId();
 				((FullAuditedEntity)entityEntry.Entity).IsDeleted = true;
 			}
