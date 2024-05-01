@@ -6,7 +6,7 @@ namespace AgileKnowledge.Service.Mappings.KnowledgeBases
 	{
 		public KnowledgeBaseQuantizationState State { get; set; }
 
-		public Guid KnowledgeBaseId { get; set; }
+		public Guid KnowledgeBaseDetailsId { get; set; }
 
 		public string FileName { get; set; }
 

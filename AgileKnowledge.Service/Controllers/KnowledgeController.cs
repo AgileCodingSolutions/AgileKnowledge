@@ -12,6 +12,10 @@ using videochatspa.Server.Mappings.BaseDto;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using AgileKnowledge.Service.Domain.Enities;
+using AgileKnowledge.Service.Service;
+using Microsoft.KernelMemory;
+using DocumentFormat.OpenXml.Office2010.ExcelAc;
+using DocumentFormat.OpenXml.Vml;
 
 namespace AgileKnowledge.Service.Controllers
 {
@@ -23,12 +27,14 @@ namespace AgileKnowledge.Service.Controllers
 		private readonly KnowledgeDbContext _dbContext;
 		private readonly IMapper _mapper;
 		private readonly JwtTokenProvider _jwtTokenProvider;
+		private readonly KnowledgeMemoryService _memoryService;
 
-		public KnowledgeController(KnowledgeDbContext dbContext, IMapper mapper, JwtTokenProvider jwtTokenProvider)
+		public KnowledgeController(KnowledgeDbContext dbContext, IMapper mapper, JwtTokenProvider jwtTokenProvider, KnowledgeMemoryService memoryService)
 		{
 			_dbContext = dbContext;
 			_mapper = mapper;
 			_jwtTokenProvider = jwtTokenProvider;
+			_memoryService = memoryService;
 		}
 
 		[HttpGet]
@@ -135,15 +141,77 @@ namespace AgileKnowledge.Service.Controllers
 
 
 
+		[HttpGet]
+		public async Task<PagedResultDto<KnowledgeBaseDetailVectorQuantityDto>> GetDetailVectorQuantityAsync(KnowledgeBaseDetailsVectorQuantityInputDto input)
+		{
 
+			var memoryServerless = _memoryService.CreateMemoryServerless();
+			var memoryDbs = memoryServerless.Orchestrator.GetMemoryDbs();
 
+			var entity = await _dbContext.KnowledgeBaseDetails.Where(x=>x.Id == input.KnowledgeBaseDetailsId).FirstOrDefaultAsync();
+
+			var dto = new List<KnowledgeBaseDetailVectorQuantityDto>();
+
+			foreach (var memoryDb in memoryDbs)
+			{
+				// 通过pageSize和page获取到最大数量
+				var limit = input.PageSize * input.PageNumber;
+				if (limit < 10)
+				{
+					limit = 10;
+				}
+
+				var filter = new MemoryFilter().ByDocument(input.KnowledgeBaseDetailsId.ToString());
+
+				int size = 0;
+				await foreach (var item in memoryDb.GetListAsync("wiki", new List<MemoryFilter>()
+				               {
+					               filter
+				               }, limit, true))
+				{
+					size++;
+					if (size < input.PageSize * (input.PageNumber - 1))
+					{
+						continue;
+					}
+
+					if (size > input.PageSize * input.PageNumber)
+					{
+						break;
+					}
+
+					dto.Add(new KnowledgeBaseDetailVectorQuantityDto()
+					{
+						Content = item.Payload["text"].ToString() ?? string.Empty,
+						FileId = item.Tags.FirstOrDefault(x => x.Key == "fileId").Value?.FirstOrDefault() ?? string.Empty,
+						Id = item.Id,
+						Index = size,
+						WikiDetailId = item.Tags["wikiDetailId"].FirstOrDefault() ?? string.Empty,
+						Document_Id = item.Tags["__document_id"].FirstOrDefault() ?? string.Empty
+					});
+				}
+			}
+			
+
+			return new PagedResultDto<KnowledgeBaseDetailVectorQuantityDto>(entity.DataCount, dto);
+		}
 
 
 		[HttpGet]
 		public async Task<List<CheckQuantizationStateDto>> CheckQuantizationStateAsync(Guid knowledgeBaseId)
 		{
 
+			var values = QuantizeBackgroundService.CacheKnowledgeBaseDetails.Values.Where(x => x.Item1.KnowledgeBase.Id == knowledgeBaseId).ToList();
 
+			if (values.Any())
+			{
+				return values.Select(x => new CheckQuantizationStateDto
+				{
+					KnowledgeBaseDetailsId = x.Item1.Id,
+					FileName = x.Item1.File.FullName,
+					State = x.Item1.State
+				}).ToList();
+			}
 
 			return new List<CheckQuantizationStateDto>();
 		}

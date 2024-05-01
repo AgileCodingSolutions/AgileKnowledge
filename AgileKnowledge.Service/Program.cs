@@ -2,6 +2,8 @@ using AgileKnowledge.Service.Domain;
 using AgileKnowledge.Service.Helper;
 using AgileKnowledge.Service.Mappings;
 using AgileKnowledge.Service.Options;
+using AgileKnowledge.Service.Service;
+
 using AutoMapper;
 
 using Microsoft.EntityFrameworkCore;
@@ -11,6 +13,12 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Configuration.GetSection(ConnectionStringsOptions.Name)
 	.Get<ConnectionStringsOptions>();
+
+builder.Configuration.GetSection(OpenAIOption.Name)
+	.Get<OpenAIOption>();
+
+
+
 
 
 // Add services to the container.
@@ -37,10 +45,14 @@ builder.Services.AddSingleton(mapper);
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddSingleton<JwtTokenProvider>();
 
-
-
 builder.Services.AddDbContext<KnowledgeDbContext>(options =>
-	options.UseNpgsql(ConnectionStringsOptions.DefaultConnection));
+{
+	options.UseNpgsql(ConnectionStringsOptions.DefaultConnection);
+});
+
+builder.Services.AddSingleton<KnowledgeMemoryService>();
+
+builder.Services.AddHostedService<QuantizeBackgroundService>();
 
 
 var app = builder.Build();

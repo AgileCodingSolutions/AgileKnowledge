@@ -54,9 +54,8 @@ namespace AgileKnowledge.Service.Controllers
 				return StatusCode(StatusCodes.Status500InternalServerError, $"Error saving file: {ex.Message}");
 			}
 
-			var fileStorage = new FileStorage(file.FileName, filePath, file.Length, false);
-			fileStorage.SetFullName(fileInfo.FullName);
-
+			var fileStorage = new FileStorage(file.FileName, filePath,"file", file.Length, false);
+	
 			await _dbContext.FileStorages.AddAsync(fileStorage);
 			await _dbContext.SaveChangesAsync();
 
@@ -66,5 +65,37 @@ namespace AgileKnowledge.Service.Controllers
 				Path = fileStorage.Path
 			};
 		}
+
+
+		[HttpPost]
+		public async Task<ActionResult<UploadFileResult>> UploadWeb(string path)
+		{
+
+			var fileStorage = new FileStorage("Html", path,"web", 0, false);
+			await _dbContext.FileStorages.AddAsync(fileStorage);
+			await _dbContext.SaveChangesAsync();
+
+			return new UploadFileResult
+			{
+				Id = fileStorage.Id,
+				Path = fileStorage.Path
+			};
+		}
+
+		[HttpPost]
+		public async Task<ActionResult<UploadFileResult>> UploadData(string path)
+		{
+			
+			var fileStorage = new FileStorage("Data", path,"data", 0, false);
+			await _dbContext.FileStorages.AddAsync(fileStorage);
+			await _dbContext.SaveChangesAsync();
+
+			return new UploadFileResult
+			{
+				Id = fileStorage.Id,
+				Path = fileStorage.Path
+			};
+		}
+
 	}
 }

@@ -9,15 +9,17 @@ namespace AgileKnowledge.Service.Domain.Enities
         public long Size { get; set; }
         public bool IsCompression { get; set; }
         public string FullName { get; set; }
+        public string Type { get; set; }
 
         protected FileStorage()
         {
         }
 
-        public FileStorage(string name, string path, long size, bool isCompression)
+        public FileStorage(string name, string path,string type, long size, bool isCompression)
         {
             Name = name;
             Path = path;
+            Type = type;
             Size = size;
             IsCompression = isCompression;
         }

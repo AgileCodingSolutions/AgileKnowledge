@@ -57,6 +57,7 @@ namespace AgileKnowledge.Service.Domain
 
 				entity.Property(e => e.Name).HasMaxLength(128);
 				entity.Property(e => e.FullName).HasMaxLength(2048);
+				entity.Property(e => e.Type).HasMaxLength(64);
 				entity.Property(e => e.Path).HasMaxLength(2048);
 				entity.Property(e => e.Size).IsRequired();
 				entity.Property(e => e.IsCompression).IsRequired();
