@@ -10,8 +10,10 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using videochatspa.Server.Mappings.BaseDto;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Text.RegularExpressions;
 using AgileKnowledge.Service.Domain.Enities;
+using AgileKnowledge.Service.Options;
 using AgileKnowledge.Service.Service;
 using Microsoft.KernelMemory;
 using DocumentFormat.OpenXml.Office2010.ExcelAc;
@@ -194,6 +196,87 @@ namespace AgileKnowledge.Service.Controllers
 			
 
 			return new PagedResultDto<KnowledgeBaseDetailVectorQuantityDto>(entity.DataCount, dto);
+		}
+
+
+		[HttpDelete]
+		public async Task DeleteDetailVectorQuantityAsync(string documentId)
+		{
+			var memoryServerless = _memoryService.CreateMemoryServerless();
+			await memoryServerless.DeleteDocumentAsync(documentId, "wiki");
+		}
+
+		[HttpGet]
+		public async Task<SearchVectorQuantityDto> GetSearchVectorQuantityAsync(long wikiId, string search,
+			double minRelevance = 0D)
+		{
+			var stopwatch = Stopwatch.StartNew();
+			var memoryServerless = _memoryService.CreateMemoryServerless();
+			var searchResult = await memoryServerless.SearchAsync(search, "wiki",
+				new MemoryFilter().ByTag("wikiId", wikiId.ToString()), minRelevance: minRelevance, limit: 5);
+
+			stopwatch.Stop();
+
+			var searchVectorQuantityResult = new SearchVectorQuantityDto();
+
+			searchVectorQuantityResult.ElapsedTime = stopwatch.ElapsedMilliseconds;
+
+			searchVectorQuantityResult.Result = new List<SearchVectorQuantity>();
+
+			foreach (var resultResult in searchResult.Results)
+			{
+				searchVectorQuantityResult.Result.AddRange(resultResult.Partitions.Select(partition =>
+					new SearchVectorQuantity()
+					{
+						Content = partition.Text,
+						DocumentId = resultResult.DocumentId,
+						Relevance = partition.Relevance,
+						FileId = partition.Tags["fileId"].FirstOrDefault() ?? string.Empty
+					}));
+			}
+
+			var fileIds = new List<string>();
+			fileIds.AddRange(searchVectorQuantityResult.Result.Select(x =>
+			{
+				return x.FileId;
+
+				return "";
+			}).Where(x => x != ""));
+
+			var files = await _dbContext.FileStorages.Where(x => fileIds.Contains(x.Id.ToString())).ToListAsync();
+
+			foreach (var quantityDto in searchVectorQuantityResult.Result)
+			{
+				var file = files.FirstOrDefault(x => x.Id.ToString() == quantityDto.FileId);
+				quantityDto.FullPath = file?.Path;
+
+				quantityDto.FileName = file?.Name;
+			}
+
+			return searchVectorQuantityResult;
+		}
+
+		[HttpDelete]
+		public async Task DeleteDetailsVectorAsync(string id)
+		{
+			await _dbContext.Database.ExecuteSqlRawAsync(
+				$"delete from \"{ConnectionStringsOptions.TableNamePrefix + "wiki"}\" where id='{id}';");
+		}
+
+		[HttpPut]
+		public async Task RetryVectorDetailAsync(Guid knowledgeBaseDetailsId)
+		{
+
+			var wikiDetail = await _dbContext.KnowledgeBaseDetails.Where(x => x.Id == knowledgeBaseDetailsId)
+				.FirstOrDefaultAsync();
+			await QuantizeBackgroundService.AddKnowledgeBaseDetailAsync(wikiDetail);
+		}
+
+		[HttpPut]
+		public async Task DetailsRenameNameAsync(Guid fileId, string name)
+		{
+			await _dbContext.FileStorages.Where(x => x.Id == fileId)
+				.ExecuteUpdateAsync(s => s.SetProperty(b => b.FullName, b => name));
 		}
 
 
