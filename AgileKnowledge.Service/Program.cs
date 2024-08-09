@@ -17,8 +17,8 @@ builder.Configuration.GetSection(ConnectionStringsOptions.Name)
 builder.Configuration.GetSection(OpenAIOption.Name)
 	.Get<OpenAIOption>();
 
-
-
+builder.Configuration.GetSection(JwtOptions.Name)
+	.Get<JwtOptions>();
 
 
 // Add services to the container.
@@ -39,6 +39,16 @@ var mapper = config.CreateMapper();
 builder.Services.AddSingleton(mapper);
 
 #endregion
+
+builder.Services.AddCors(options =>
+{
+	options.AddPolicy("AllowAll",
+		builder => builder
+			.SetIsOriginAllowed(_ => true)
+			.AllowAnyMethod()
+			.AllowAnyHeader()
+			.AllowCredentials());
+});
 
 
 
@@ -63,7 +73,7 @@ if (app.Environment.IsDevelopment())
 	app.UseSwagger();
 	app.UseSwaggerUI();
 }
-
+app.UseCors("AllowAll");
 app.UseHttpsRedirection();
 
 app.UseDefaultFiles();

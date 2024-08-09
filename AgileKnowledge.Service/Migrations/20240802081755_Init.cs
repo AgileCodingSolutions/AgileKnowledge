@@ -76,6 +76,7 @@ namespace AgileKnowledge.Service.Migrations
                     Size = table.Column<long>(type: "bigint", nullable: false),
                     IsCompression = table.Column<bool>(type: "boolean", nullable: false),
                     FullName = table.Column<string>(type: "character varying(2048)", maxLength: 2048, nullable: false),
+                    Type = table.Column<string>(type: "character varying(64)", maxLength: 64, nullable: false),
                     CreationTime = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     CreatorId = table.Column<Guid>(type: "uuid", nullable: true),
                     LastModificationTime = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
@@ -146,7 +147,7 @@ namespace AgileKnowledge.Service.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "ChatApplicationKnowledgeBase",schema: "chat",
+                name: "ChatApplicationKnowledgeBase",
                 columns: table => new
                 {
                     ChatApplicationId = table.Column<Guid>(type: "uuid", nullable: false),
@@ -244,7 +245,6 @@ namespace AgileKnowledge.Service.Migrations
 
             migrationBuilder.CreateIndex(
                 name: "IX_ChatApplicationKnowledgeBase_KnowledgeBasesId",
-                schema: "chat",
                 table: "ChatApplicationKnowledgeBase",
                 column: "KnowledgeBasesId");
 
@@ -277,8 +277,7 @@ namespace AgileKnowledge.Service.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "ChatApplicationKnowledgeBase",
-                schema: "chat");
+                name: "ChatApplicationKnowledgeBase");
 
             migrationBuilder.DropTable(
                 name: "Details",

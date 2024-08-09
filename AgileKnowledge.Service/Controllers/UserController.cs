@@ -113,8 +113,16 @@ namespace AgileKnowledge.Service.Controllers
 			return new ResultDto();
 		}
 
+		[HttpDelete]
+		public async Task DeleteUserAsync(Guid id)
+		{
+			if (id == _jwtTokenProvider.GetUserId())
+				throw new Exception("不能删除自己");
 
-
+			var userInfo = _dbContext.Users.FirstOrDefault(x => x.Id == id);
+			_dbContext.Users.Remove(userInfo);
+			await _dbContext.SaveChangesAsync();
+		}
 
 	}
 }

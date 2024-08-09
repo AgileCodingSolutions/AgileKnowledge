@@ -11,5 +11,13 @@ namespace AgileKnowledge.Service.Domain.Enities
         protected ChatDialog()
         {
         }
+
+        public ChatDialog(string name, ChatApplication chat, string description)
+        {
+	        Name = name;
+	        ChatApplication = chat;
+	        Description = description;
+	        ChatDialogHistorys = new List<ChatDialogHistory>();
+        }
     }
 }

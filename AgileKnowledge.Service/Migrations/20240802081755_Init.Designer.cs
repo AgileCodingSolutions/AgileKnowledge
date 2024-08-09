@@ -12,8 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace AgileKnowledge.Service.Migrations
 {
     [DbContext(typeof(KnowledgeDbContext))]
-    [Migration("20240501025226_FileStorages_Type")]
-    partial class FileStorages_Type
+    [Migration("20240802081755_Init")]
+    partial class Init
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

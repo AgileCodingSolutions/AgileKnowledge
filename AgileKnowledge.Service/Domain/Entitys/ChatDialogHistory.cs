@@ -12,5 +12,13 @@ namespace AgileKnowledge.Service.Domain.Enities
         protected ChatDialogHistory()
         {
         }
+
+        public ChatDialogHistory(ChatDialog chatDialog, string content, int tokenConsumption, ChatDialogHistoryType type = ChatDialogHistoryType.Text)
+        {
+	        ChatDialog = chatDialog;
+	        Content = content;
+	        TokenConsumption = tokenConsumption;
+	        Type = type;
+        }
     }
 }
