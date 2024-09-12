@@ -21,6 +21,7 @@ namespace AgileKnowledge.Service.Domain.Enities
             Path = path;
             Type = type;
             Size = size;
+            FullName = "";
             IsCompression = isCompression;
         }
 

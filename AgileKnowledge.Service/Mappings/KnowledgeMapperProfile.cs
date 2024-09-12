@@ -1,4 +1,6 @@
 ﻿using AgileKnowledge.Service.Domain.Enities;
+using AgileKnowledge.Service.Mappings.ChatApplications;
+using AgileKnowledge.Service.Mappings.KnowledgeBases;
 using AgileKnowledge.Service.Mappings.Users;
 using AutoMapper;
 
@@ -9,6 +11,13 @@ namespace AgileKnowledge.Service.Mappings
 		public KnowledgeMapperProfile()
 		{
 			CreateMap<User, UserDto>();
+
+			CreateMap<KnowledgeBase, KnowledgeBasesDto>();
+
+			CreateMap<ChatApplication, ChatApplicationDto>();
+
+
+
 		}
 	}
 }
