@@ -1,9 +1,7 @@
 import { Table } from 'antd';
 import { useEffect, useState } from 'react';
-import { DisableUser, GetUsers, UpdateUserRole } from '../../../services/UserService';
-
 import { Button, Dropdown, MenuProps,message } from 'antd';
-import { RoleType } from '../../models/index.d';
+import { ChangeRoleInputDto, DisableInputDto, RoleType, UserDto, UserService } from '../../../services/service-proxies';
 
 interface IUserListProps {
     keyword: string;
@@ -12,6 +10,11 @@ interface IUserListProps {
 export default function UserList({
     keyword
 }:IUserListProps) {
+
+    var userService = new UserService();
+
+
+
     const [input, setInput] = useState({
         page: 1,
         pageSize: 10
@@ -38,16 +41,16 @@ export default function UserList({
 
     async function loadingData() {
         try {
-            const result = await GetUsers(keyword, input.page, input.pageSize)
+            const result = await userService.getList(keyword, "", input.page, input.pageSize)
 
-            const updatedItems = result.items.map((item: any, index : any) => {
+            const updatedItems = result.items!.map((item: UserDto, index : number) => {
                 return {
                     ...item,
                     key: index + 1
                 };
             });
-            setData(updatedItems);
-            setTotal(result.totalCount);
+            setData(updatedItems as any);
+            setTotal(result.totalCount!);
         } catch (error) {
 
         }
@@ -98,7 +101,7 @@ export default function UserList({
             title: '操作',
             dataIndex: 'acting',
             key: 'acting',
-            render: (_: any, item: any) => {
+            render: (_: any, item: UserDto) => {
                 const items: MenuProps['items'] = [];
                 items.push({
                     key: '1',
@@ -107,12 +110,15 @@ export default function UserList({
                         console.log('编辑');
                     }
                 })
-                if (item.role === RoleType.Admin) {
+                if (item.role === RoleType._0) {
                     items.push({
                         key: '4',
                         label: '取消管理员',
                         onClick: async () => {
-                            await UpdateUserRole(item.id, RoleType.User);
+                            userService.changeRole(new ChangeRoleInputDto({
+                                id:item.id,
+                                role: RoleType._1
+                            }));
                             message.success('取消成功');
                             await ResetLoading();
                         }
@@ -124,7 +130,10 @@ export default function UserList({
                             key: '3',
                             label: '禁用',
                             onClick: async () => {
-                                await DisableUser(item.id, true);
+                                await userService.disable(new DisableInputDto({
+                                    id: item.id,
+                                    disable: true
+                                }));
                                 message.success('禁用成功');
                                 await ResetLoading();
                             }
@@ -134,7 +143,10 @@ export default function UserList({
                             key: '3',
                             label: '启用',
                             onClick: async () => {
-                                await DisableUser(item.id, false);
+                                await userService.disable(new DisableInputDto({
+                                    id: item.id,
+                                    disable: false
+                                }));
                                 message.success('启用成功');
                                 await ResetLoading();
                             }
@@ -145,7 +157,10 @@ export default function UserList({
                         key: '4',
                         label: '设为管理员',
                         onClick: async () => {
-                            await UpdateUserRole(item.id, RoleType.Admin);
+                            await userService.changeRole(new ChangeRoleInputDto({
+                                id: item.id,
+                                role: RoleType._0
+                            }));
                             message.success('设置成功');
                             await ResetLoading();
                         }

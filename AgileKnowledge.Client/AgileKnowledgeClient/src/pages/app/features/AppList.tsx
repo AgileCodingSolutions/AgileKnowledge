@@ -6,7 +6,7 @@ import { message, Button, Pagination } from 'antd';
 import styled from 'styled-components';
 import { DeleteOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
-import { ChatApplicationDto } from '../../models';
+import { ChatApplicationDto, ChatApplicationService } from '../../../services/service-proxies';
 
 
 const AppItemDetail = styled.div`
@@ -27,10 +27,12 @@ export function AppList(props: IAppListProps) {
     const [data, setData] = useState<ChatApplicationDto[]>([]);
     const [total, setTotal] = useState(0);
 
+    var chatApplicationService = new ChatApplicationService();
+
     const render = (item: ChatApplicationDto) => (
         <Flexbox align={'flex-start'} gap={8} horizontal style={{ padding: 16, height: 100, width: '100%' }}>
             <Flexbox onClick={()=>{
-                openAppDetail(item.id)
+                openAppDetail(item.id!)
             }} style={{
                 width: '100%',
             }}>
@@ -59,7 +61,7 @@ export function AppList(props: IAppListProps) {
                     right: 16,
                 }}
                 icon={<DeleteOutlined />}
-                onClick={() => deleteApp(item.id)}
+                onClick={() => deleteApp(item.id!)}
             />
         </Flexbox>
     )
@@ -83,9 +85,9 @@ export function AppList(props: IAppListProps) {
 
     async function loadingData() {
         try {
-            // const data = await GetChatApplicationsList(props.input.page, props.input.pageSize);
-            // setData(data.result);
-            // setTotal(data.total);
+            const data = await chatApplicationService.getList("","",props.input.page, props.input.pageSize);
+            setData(data.items!);
+            setTotal(data.totalCount!);
         } catch (error) {
             console.log(error);
             message.error('获取数据失败');

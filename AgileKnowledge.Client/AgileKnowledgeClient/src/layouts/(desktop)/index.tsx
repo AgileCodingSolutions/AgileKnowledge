@@ -25,9 +25,9 @@ const DesktopLayout = memo(() => {
     role: 'admin, user'
   }, {
     icon: Album,
-    key: 'wiki',
+    key: 'knowledge',
     description: '知识库',
-    path: '/wiki',
+    path: '/knowledge',
     role: 'admin, user'
   },{
     icon: SquareFunction,

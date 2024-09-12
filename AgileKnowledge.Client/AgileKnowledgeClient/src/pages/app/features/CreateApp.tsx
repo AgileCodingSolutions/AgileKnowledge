@@ -1,6 +1,6 @@
 import { Modal } from "@lobehub/ui";
 import { Form, Input, Button, message } from 'antd';
-// import { CreateChatApplications } from "../../../services/ChatApplicationService";
+import { ChatApplicationService } from "../../../services/service-proxies";
 
 interface ICreateAppProps {
     visible: boolean;
@@ -13,9 +13,13 @@ type CreateAppType = {
 };
 
 export function CreateApp(props: ICreateAppProps) {
+
+
+    var chatApplicationService = new ChatApplicationService();
+
     async function onFinish(values: any) {
         try {
-            // await CreateChatApplications(values);
+            await chatApplicationService.create(values);
             message.success('创建成功');
             props.onSuccess();
         } catch (e) {
