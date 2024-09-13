@@ -65,7 +65,7 @@ export function AppList(props: IAppListProps) {
     }
 
     function openWikiDetail(id: string) {
-        navigate(`/wiki/${id}`);
+        navigate(`/app/${id}`);
     }
 
     async function loadingData() {

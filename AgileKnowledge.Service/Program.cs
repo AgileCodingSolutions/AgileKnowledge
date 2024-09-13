@@ -88,7 +88,7 @@ app.MapControllers();
 #region MigrationDb
 await using var context = app.Services.CreateScope().ServiceProvider.GetService<KnowledgeDbContext>();
 {
-	await context!.Database.MigrateAsync();
+	// await context!.Database.MigrateAsync();
 
 	await context.Database.ExecuteSqlInterpolatedAsync($"CREATE EXTENSION IF NOT EXISTS vector;");
 }

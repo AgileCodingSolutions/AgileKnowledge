@@ -1,7 +1,7 @@
 import { Modal } from "@lobehub/ui";
-import { Form, Input, Button, message } from 'antd';
+import { Form, Input, Button, message , FormInstance} from 'antd';
 import { ChatApplicationService } from "../../../services/service-proxies";
-
+import {useRef } from "react";
 interface ICreateAppProps {
     visible: boolean;
     onClose: () => void;
@@ -14,7 +14,7 @@ type CreateAppType = {
 
 export function CreateApp(props: ICreateAppProps) {
 
-
+    const formRef = useRef<FormInstance>(null);
     var chatApplicationService = new ChatApplicationService();
 
     async function onFinish(values: any) {
@@ -22,6 +22,9 @@ export function CreateApp(props: ICreateAppProps) {
             await chatApplicationService.create(values);
             message.success('创建成功');
             props.onSuccess();
+            if (formRef.current) {
+                formRef.current.resetFields();
+            }
         } catch (e) {
             message.error('创建失败');
         }
@@ -40,6 +43,7 @@ export function CreateApp(props: ICreateAppProps) {
             footer={null}
         >
             <Form
+                ref={formRef}
                 name="basic"
                 onFinish={onFinish}
                 onFinishFailed={onFinishFailed}

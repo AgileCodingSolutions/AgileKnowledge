@@ -72,7 +72,7 @@ export function AppList(props: IAppListProps) {
 
     async function deleteApp(id: string) {
         try {
-            // await DeleteChatApplications(id);
+            await chatApplicationService.delete(id);
             message.success('删除成功');
             props.setInput({
                 ...props.input,

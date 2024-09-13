@@ -65,7 +65,7 @@ namespace AgileKnowledge.Service.Controllers
 			var user = new User(input.Account, input.Name, input.Password,
 				"https://blog-simple.oss-cn-shenzhen.aliyuncs.com/Avatar.jpg", input.Email, input.Phone,
 				false);
-
+			
 			await _dbContext.AddAsync(user);
 			await _dbContext.SaveChangesAsync();
 		}

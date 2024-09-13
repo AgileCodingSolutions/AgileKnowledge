@@ -1,10 +1,11 @@
 import { Modal } from "@lobehub/ui";
-import { Form, Input, Button, message, AutoComplete, Upload } from 'antd';
-import { useEffect, useState } from "react";
+import { Form, Input, Button, message, AutoComplete, Upload ,FormInstance } from 'antd';
+import { useEffect, useState,useRef } from "react";
 import { getModels } from "../../../store/Model";
 import { PlusOutlined } from '@ant-design/icons';
 import { UploadFile } from "../../../services/StorageService";
 import { KnowledgeService } from "../../../services/service-proxies";
+
 
 interface ICreateAppProps {
     visible: boolean;
@@ -25,6 +26,7 @@ export function CreateApp(props: ICreateAppProps) {
     const [previewImage, setPreviewImage] = useState("");
     const [previewTitle, setPreviewTitle] = useState("");
     const [fileList, setFileList] = useState([] as any[]);
+    const formRef = useRef<FormInstance>(null);
 
     var knowledgeService = new KnowledgeService();
     const handleCancel = () => setPreviewVisible(false);
@@ -72,14 +74,20 @@ export function CreateApp(props: ICreateAppProps) {
             if (fileList.length === 0) {
                 return message.error('请上传头像');
             }
-            const resultFile = await UploadFile(fileList[0].originFileObj)
-            values.icon = resultFile.path;
+            const response = await UploadFile(fileList[0].originFileObj)
+            //debugger;
+            values.icon = response.id;
             await knowledgeService.create(values);
             message.success('创建成功');
             props.onSuccess();
+            if (formRef.current) {
+                formRef.current.resetFields();
+            }
+            setFileList([]);
         } catch (e) {
             message.error('创建失败');
         }
+        
     }
 
     function onFinishFailed(errorInfo: any) {
@@ -95,6 +103,7 @@ export function CreateApp(props: ICreateAppProps) {
             footer={null}
         >
             <Form
+                ref={formRef}
                 name="basic"
                 onFinish={onFinish}
                 onFinishFailed={onFinishFailed}
@@ -120,7 +129,7 @@ export function CreateApp(props: ICreateAppProps) {
                         )}
                     </Upload>
                     <Modal
-                        visible={previewVisible}
+                        open={previewVisible}
                         title={previewTitle}
                         footer={null}
                         onCancel={handleCancel}

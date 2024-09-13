@@ -1,3 +1,5 @@
+import { StorageService } from "./service-proxies";
+
 const prefix = `/api/Storage`;
 
 /**
@@ -6,10 +8,11 @@ const prefix = `/api/Storage`;
  * @returns 
  */
 export function UploadFile(file: File) {
-    const formData = new FormData();
-    formData.append('file', file);
-    return fetch(`${prefix}/UploadFile`, {
-        method: 'POST',
-        body: formData
-    });
+
+    var storageService = new StorageService();
+    const fileParameter = {
+        data: file,
+        fileName: file.name // 你可以根据需要设置文件名
+    };
+    return storageService.uploadFile(fileParameter);
 }

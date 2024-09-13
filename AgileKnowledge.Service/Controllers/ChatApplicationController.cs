@@ -91,7 +91,7 @@ namespace AgileKnowledge.Service.Controllers
 
 			_dbContext.Remove(entity);
 
-			await	_dbContext.SaveChangesAsync();
+			await _dbContext.SaveChangesAsync();
 		}
 
 

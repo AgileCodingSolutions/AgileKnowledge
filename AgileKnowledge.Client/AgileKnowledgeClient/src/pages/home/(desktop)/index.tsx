@@ -45,12 +45,12 @@ export default () => {
                 nav={
                   <Flex wrap="wrap" gap="small" className="site-button-ghost-wrapper">
                     <Button type="text" onClick={() => {
-                      window.open('mailto:239573049@token-ai.cn');
+                      window.open('mailto:xxxxxxxxxxxxx');
                     }}>
                       商务合作
                     </Button>
                     <Button type="text" onClick={() => {
-                      window.open('https://ai-dotnet.com/')
+                      window.open('xxxxxxxxxxxxxxxxxx')
                     }}>
                       文档
                     </Button>
