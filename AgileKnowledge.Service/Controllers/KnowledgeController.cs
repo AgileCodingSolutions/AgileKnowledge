@@ -207,13 +207,13 @@ namespace AgileKnowledge.Service.Controllers
 		}
 
 		[HttpGet]
-		public async Task<SearchVectorQuantityDto> GetSearchVectorQuantityAsync(long wikiId, string search,
+		public async Task<SearchVectorQuantityDto> GetSearchVectorQuantityAsync(string wikiId, string search,
 			double minRelevance = 0D)
 		{
 			var stopwatch = Stopwatch.StartNew();
 			var memoryServerless = _memoryService.CreateMemoryServerless();
 			var searchResult = await memoryServerless.SearchAsync(search, "wiki",
-				new MemoryFilter().ByTag("wikiId", wikiId.ToString()), minRelevance: minRelevance, limit: 5);
+				new MemoryFilter().ByTag("wikiId", wikiId), minRelevance: minRelevance, limit: 5);
 
 			stopwatch.Stop();
 

@@ -1,8 +1,8 @@
 import { Table, Button, Dropdown, MenuProps, message, Select } from 'antd';
 import { useEffect, useState } from 'react';
 import { KnowledgeBasesDto, KnowledgeService } from '../../../services/service-proxies';
-//import WikiDetailFile from './WikiDetailFile';
-//import { WikiQuantizationState } from '../../../models/index.d';
+
+import { WikiQuantizationState } from '../../../services/service-proxies';
 
 interface IWikiDataProps {
     id: string;
@@ -131,7 +131,7 @@ export default function WikiData({ id, onChagePath }: IWikiDataProps) {
         keyword: '',
         page: 1,
         pageSize: 10,
-        //state: null as WikiQuantizationState | null
+        state: null as WikiQuantizationState | null
     });
 
     const items: MenuProps['items'] = [
@@ -244,18 +244,18 @@ export default function WikiData({ id, onChagePath }: IWikiDataProps) {
                     marginRight: 16,
                     float: 'right'
                 }}
-                // onChange={(v: WikiQuantizationState | null) => {
-                //     setInput({
-                //         ...input,
-                //         state: v
-                //     })
-                // }}
-                // options={[
-                //     { value: null, label: '全部' },
-                //     { value: WikiQuantizationState.None, label: '处理中' },
-                //     { value: WikiQuantizationState.Accomplish, label: '完成' },
-                //     { value: WikiQuantizationState.Fail, label: '失败' },
-                // ]}
+                onChange={(v: WikiQuantizationState | null) => {
+                    setInput({
+                        ...input,
+                        state: v
+                    })
+                }}
+                options={[
+                    { value: null, label: '全部' },
+                    { value: WikiQuantizationState.None, label: '处理中' },
+                    { value: WikiQuantizationState.Accomplish, label: '完成' },
+                    { value: WikiQuantizationState.Fail, label: '失败' },
+                ]}
             />
         </header>
         <Table dataSource={data}

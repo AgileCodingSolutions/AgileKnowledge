@@ -11,7 +11,7 @@ import AppDetail from './pages/app-detail/page';
 import Knowledge from './pages/knowledge/page';
 import { config } from './config';
 import { message } from 'antd';
-
+import KnowledgeDetail from './pages/knowledge/features/KnowledgeDetail'
 const router = createBrowserRouter([{
   path: '/',
   element: <Home />
@@ -34,11 +34,11 @@ const router = createBrowserRouter([{
         <Knowledge />
       </Suspense>
     },
-    // {
-    //   path: '/knowledge/:id', element: <Suspense fallback={'加载中'}>
-    //     <KnowledgeDetail />
-    //   </Suspense>
-    // },
+    {
+      path: '/knowledge/:id', element: <Suspense fallback={'加载中'}>
+        <KnowledgeDetail />
+      </Suspense>
+    },
     {
       path: '/user', element: <Suspense fallback={'加载中'}>
         <User />

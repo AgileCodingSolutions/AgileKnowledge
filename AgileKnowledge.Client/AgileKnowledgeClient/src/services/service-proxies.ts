@@ -415,55 +415,6 @@ export class ChatApplicationService {
     }
 }
 
-export class FunctionService {
-    private http: { fetch(url: RequestInfo, init?: RequestInit): Promise<Response> };
-    private baseUrl: string;
-    protected jsonParseReviver: ((key: string, value: any) => any) | undefined = undefined;
-
-    constructor(baseUrl?: string, http?: { fetch(url: RequestInfo, init?: RequestInit): Promise<Response> }) {
-        this.http = http ? http : window as any;
-        this.baseUrl = baseUrl ?? "";
-    }
-
-    /**
-     * @param body (optional) 
-     * @return Success
-     */
-    createFunction(body: FastWikiFunctionCallInput | undefined): Promise<void> {
-        let url_ = this.baseUrl + "/api/Function/CreateFunction";
-        url_ = url_.replace(/[?&]$/, "");
-
-        const content_ = JSON.stringify(body);
-
-        let options_: RequestInit = {
-            body: content_,
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-            }
-        };
-
-        return this.http.fetch(url_, options_).then((_response: Response) => {
-            return this.processCreateFunction(_response);
-        });
-    }
-
-    protected processCreateFunction(response: Response): Promise<void> {
-        const status = response.status;
-        let _headers: any = {}; if (response.headers && response.headers.forEach) { response.headers.forEach((v: any, k: any) => _headers[k] = v); };
-        if (status === 200) {
-            return response.text().then((_responseText) => {
-            return;
-            });
-        } else if (status !== 200 && status !== 204) {
-            return response.text().then((_responseText) => {
-            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
-            });
-        }
-        return Promise.resolve<void>(null as any);
-    }
-}
-
 export class KnowledgeService {
     private http: { fetch(url: RequestInfo, init?: RequestInit): Promise<Response> };
     private baseUrl: string;
@@ -691,7 +642,7 @@ export class KnowledgeService {
      * @param body (optional) 
      * @return Success
      */
-    createDetails(body: CreateKnowledgeDetailsInput | undefined): Promise<void> {
+    createDetails(body: ICreateKnowledgeDetailsInput | undefined): Promise<void> {
         let url_ = this.baseUrl + "/api/Knowledge/CreateDetails";
         url_ = url_.replace(/[?&]$/, "");
 
@@ -916,7 +867,7 @@ export class KnowledgeService {
      * @param minRelevance (optional) 
      * @return Success
      */
-    getSearchVectorQuantity(wikiId: number | undefined, search: string | undefined, minRelevance: number | undefined): Promise<SearchVectorQuantityDto> {
+    getSearchVectorQuantity(wikiId: string | undefined, search: string | undefined, minRelevance: number | undefined): Promise<SearchVectorQuantityDto> {
         let url_ = this.baseUrl + "/api/Knowledge/GetSearchVectorQuantity?";
         if (wikiId === null)
             throw new Error("The parameter 'wikiId' cannot be null.");
@@ -2073,15 +2024,24 @@ export interface ICreateKnowledgeBasesInput {
     model?: string | undefined;
     embeddingModel?: string | undefined;
 }
+export enum TrainingPattern {
+    Subsection,
+    QA
+}
 
+export enum ProcessMode {
+    Auto,
+    Custom
+}
 export class CreateKnowledgeDetailsInput implements ICreateKnowledgeDetailsInput {
     fileId?: string;
+    filePath?: string;
     knowledgeId?: string;
     maxTokensPerParagraph?: number;
     maxTokensPerLine?: number;
     overlappingTokens?: number;
-    trainingPattern?: TrainingPatternType;
-    qaPromptTemplate?: string | undefined;
+    trainingPattern?: TrainingPattern;
+    qAPromptTemplate?: string | undefined;
 
     constructor(data?: ICreateKnowledgeDetailsInput) {
         if (data) {
@@ -2095,12 +2055,13 @@ export class CreateKnowledgeDetailsInput implements ICreateKnowledgeDetailsInput
     init(_data?: any) {
         if (_data) {
             this.fileId = _data["fileId"];
+            this.filePath = _data["filePath"];
             this.knowledgeId = _data["knowledgeId"];
             this.maxTokensPerParagraph = _data["maxTokensPerParagraph"];
             this.maxTokensPerLine = _data["maxTokensPerLine"];
             this.overlappingTokens = _data["overlappingTokens"];
-            this.trainingPattern = _data["trainingPattern"];
-            this.qaPromptTemplate = _data["qaPromptTemplate"];
+            this.trainingPattern = _data["TrainingPatternType"];
+            this.qAPromptTemplate = _data["qAPromptTemplate"];
         }
     }
 
@@ -2114,24 +2075,26 @@ export class CreateKnowledgeDetailsInput implements ICreateKnowledgeDetailsInput
     toJSON(data?: any) {
         data = typeof data === 'object' ? data : {};
         data["fileId"] = this.fileId;
+        data["filePath"] = this.filePath;
         data["knowledgeId"] = this.knowledgeId;
         data["maxTokensPerParagraph"] = this.maxTokensPerParagraph;
         data["maxTokensPerLine"] = this.maxTokensPerLine;
         data["overlappingTokens"] = this.overlappingTokens;
-        data["trainingPattern"] = this.trainingPattern;
-        data["qaPromptTemplate"] = this.qaPromptTemplate;
+        data["TrainingPatternType"] = this.trainingPattern;
+        data["qAPromptTemplate"] = this.qAPromptTemplate;
         return data;
     }
 }
 
 export interface ICreateKnowledgeDetailsInput {
     fileId?: string;
+    filePath?: string;
     knowledgeId?: string;
     maxTokensPerParagraph?: number;
     maxTokensPerLine?: number;
     overlappingTokens?: number;
-    trainingPattern?: TrainingPatternType;
-    qaPromptTemplate?: string | undefined;
+    trainingPattern?: TrainingPattern;
+    qAPromptTemplate?: string | undefined;
 }
 
 export class CreateUserInput implements ICreateUserInput {
@@ -2224,130 +2187,6 @@ export class DisableInputDto implements IDisableInputDto {
 export interface IDisableInputDto {
     id?: string;
     disable?: boolean;
-}
-
-export class FastWikiFunctionCallInput implements IFastWikiFunctionCallInput {
-    name?: string | undefined;
-    description?: string | undefined;
-    content?: string | undefined;
-    parameters?: FunctionItemDto[] | undefined;
-    items?: FunctionItemDto[] | undefined;
-    imports?: string[] | undefined;
-    main?: string | undefined;
-
-    constructor(data?: IFastWikiFunctionCallInput) {
-        if (data) {
-            for (var property in data) {
-                if (data.hasOwnProperty(property))
-                    (<any>this)[property] = (<any>data)[property];
-            }
-        }
-    }
-
-    init(_data?: any) {
-        if (_data) {
-            this.name = _data["name"];
-            this.description = _data["description"];
-            this.content = _data["content"];
-            if (Array.isArray(_data["parameters"])) {
-                this.parameters = [] as any;
-                for (let item of _data["parameters"])
-                    this.parameters!.push(FunctionItemDto.fromJS(item));
-            }
-            if (Array.isArray(_data["items"])) {
-                this.items = [] as any;
-                for (let item of _data["items"])
-                    this.items!.push(FunctionItemDto.fromJS(item));
-            }
-            if (Array.isArray(_data["imports"])) {
-                this.imports = [] as any;
-                for (let item of _data["imports"])
-                    this.imports!.push(item);
-            }
-            this.main = _data["main"];
-        }
-    }
-
-    static fromJS(data: any): FastWikiFunctionCallInput {
-        data = typeof data === 'object' ? data : {};
-        let result = new FastWikiFunctionCallInput();
-        result.init(data);
-        return result;
-    }
-
-    toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {};
-        data["name"] = this.name;
-        data["description"] = this.description;
-        data["content"] = this.content;
-        if (Array.isArray(this.parameters)) {
-            data["parameters"] = [];
-            for (let item of this.parameters)
-                data["parameters"].push(item.toJSON());
-        }
-        if (Array.isArray(this.items)) {
-            data["items"] = [];
-            for (let item of this.items)
-                data["items"].push(item.toJSON());
-        }
-        if (Array.isArray(this.imports)) {
-            data["imports"] = [];
-            for (let item of this.imports)
-                data["imports"].push(item);
-        }
-        data["main"] = this.main;
-        return data;
-    }
-}
-
-export interface IFastWikiFunctionCallInput {
-    name?: string | undefined;
-    description?: string | undefined;
-    content?: string | undefined;
-    parameters?: FunctionItemDto[] | undefined;
-    items?: FunctionItemDto[] | undefined;
-    imports?: string[] | undefined;
-    main?: string | undefined;
-}
-
-export class FunctionItemDto implements IFunctionItemDto {
-    key?: string | undefined;
-    value?: string | undefined;
-
-    constructor(data?: IFunctionItemDto) {
-        if (data) {
-            for (var property in data) {
-                if (data.hasOwnProperty(property))
-                    (<any>this)[property] = (<any>data)[property];
-            }
-        }
-    }
-
-    init(_data?: any) {
-        if (_data) {
-            this.key = _data["key"];
-            this.value = _data["value"];
-        }
-    }
-
-    static fromJS(data: any): FunctionItemDto {
-        data = typeof data === 'object' ? data : {};
-        let result = new FunctionItemDto();
-        result.init(data);
-        return result;
-    }
-
-    toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {};
-        data["key"] = this.key;
-        data["value"] = this.value;
-        return data;
-    }
-}
-
-export interface IFunctionItemDto {
-    key?: string | undefined;
-    value?: string | undefined;
 }
 
 export class KnowledgeBaseDetailVectorQuantityDto implements IKnowledgeBaseDetailVectorQuantityDto {
@@ -3236,6 +3075,29 @@ export class ApiException extends Error {
     static isApiException(obj: any): obj is ApiException {
         return obj.isApiException === true;
     }
+}
+export interface WikiDto {
+    id: number;
+    icon: string;
+    name: string;
+    model: string;
+    embeddingModel: string;
+}
+
+
+export enum WikiQuantizationState {
+    None = 0,
+    Accomplish,
+    Fail
+}
+
+export interface WikiDetailVectorQuantityDto {
+    id: string;
+    content: string;
+    document_Id: string;
+    wikiDetailId: string;
+    fileId: string;
+    index: number;
 }
 
 function throwException(message: string, status: number, response: string, headers: { [key: string]: any; }, result?: any): any {
