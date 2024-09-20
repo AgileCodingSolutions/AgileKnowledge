@@ -17,7 +17,14 @@ interface Models {
 let models: Models;
 
 async function loadingModel() {
-    const response = await fetch('/model.json');
+    let options_: RequestInit = {
+        method: "GET",
+        headers: {
+            
+            "Accept": "text/plain"
+        }
+    };
+    const response = await fetch('/model.json',options_);
     models = await response.json();
 
 }

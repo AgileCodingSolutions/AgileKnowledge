@@ -8,6 +8,8 @@ import { KnowledgeService } from '../../../services/service-proxies';
 import WikiData from '../features/CheckQuantizationState'
 import UploadWikiFile from '../features/UploadWikiFile'
 import SearchDetail from '../features/SearchDetail'
+import WikiInfo from '../features/WikiInfo'
+import { config } from '../../../config';
 const LeftTabs = styled.div`
     width: 190px;
     min-width: 190px;
@@ -87,7 +89,7 @@ export default memo(() => {
                             display: 'block',
                             marginBottom: 16
                         }}
-                        src={application.icon} />
+                        src={config.FAST_API_URL+'/'+application.icon} />
                     <div style={{
                         fontSize: 18,
                         overflow: 'hidden',
@@ -155,9 +157,9 @@ export default memo(() => {
                  {
                      tab?.key === 2 && <SearchDetail onChagePath={key => changeTab(key)} id={id} />
                  }
-                 {/* {
+                 {
                      tab?.key === 3 && <WikiInfo id={id} />
-                 } */}
+                 }
                  {
                      tab === 'upload' && <UploadWikiFile id={id} onChagePath={key => changeTab(key)} />
                  }

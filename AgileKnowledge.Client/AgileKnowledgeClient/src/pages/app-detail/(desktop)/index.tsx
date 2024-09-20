@@ -5,6 +5,7 @@ import { Button } from 'antd';
 import styled from 'styled-components';
 import AppDetailInfo from '../feautres/AppDetailInfo';
 import { ChatApplicationService } from '../../../services/service-proxies';
+import ReleaseApplication from '../feautres/ReleaseApplication';
 
 const LeftTabs = styled.div`
     width: 140px;
@@ -46,6 +47,9 @@ export default memo(() => {
         const tabs = [{
             key: 1,
             label: '应用配置'
+        }, {
+            key: 3,
+            label: '发布应用'
         }];
 
         changeTab(tabs[0]);
@@ -78,7 +82,12 @@ export default memo(() => {
 
             }}>
                 {
-                   <AppDetailInfo value={application} />
+                    tab?.key === 1 ? <AppDetailInfo value={application} /> : (
+                    tab?.key === 2 ? <></> :
+                            (
+                                tab?.key === 3 ? <ReleaseApplication id={application.id} /> : null
+                            )
+                    )
                 }
             </div>
         </>

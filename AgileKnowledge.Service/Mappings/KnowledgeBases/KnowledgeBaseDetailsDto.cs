@@ -1,4 +1,5 @@
-﻿using AgileKnowledge.Service.Domain.Enum;
+﻿using AgileKnowledge.Service.Domain.Enities;
+using AgileKnowledge.Service.Domain.Enum;
 
 namespace AgileKnowledge.Service.Mappings.KnowledgeBases
 {
@@ -11,9 +12,10 @@ namespace AgileKnowledge.Service.Mappings.KnowledgeBases
 		public TrainingPatternType TrainingPattern { get; set; } 
 		public string QAPromptTemplate { get; set; } 
 		public int DataCount { get; set; }
+        public FileStorage File { get; set; }
 
-
-		public Guid LastModifierId { get; set; }
+        public KnowledgeBase KnowledgeBase { get; set; }
+        public Guid LastModifierId { get; set; }
 		public DateTime? LastModificationTime { get; set; }
 
 	}

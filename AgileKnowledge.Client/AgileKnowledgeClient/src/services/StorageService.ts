@@ -1,6 +1,7 @@
 import { StorageService } from "./service-proxies";
+import { config } from '../config';
+const prefix = `/api/${config.VITE_VERSIONS}/Storages`;
 
-const prefix = `/api/Storage`;
 
 /**
  * 上传文件

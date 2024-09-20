@@ -415,6 +415,55 @@ export class ChatApplicationService {
     }
 }
 
+export class FunctionService {
+    private http: { fetch(url: RequestInfo, init?: RequestInit): Promise<Response> };
+    private baseUrl: string;
+    protected jsonParseReviver: ((key: string, value: any) => any) | undefined = undefined;
+
+    constructor(baseUrl?: string, http?: { fetch(url: RequestInfo, init?: RequestInit): Promise<Response> }) {
+        this.http = http ? http : window as any;
+        this.baseUrl = baseUrl ?? "";
+    }
+
+    /**
+     * @param body (optional) 
+     * @return Success
+     */
+    createFunction(body: FastWikiFunctionCallInput | undefined): Promise<void> {
+        let url_ = this.baseUrl + "/api/Function/CreateFunction";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(body);
+
+        let options_: RequestInit = {
+            body: content_,
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            }
+        };
+
+        return this.http.fetch(url_, options_).then((_response: Response) => {
+            return this.processCreateFunction(_response);
+        });
+    }
+
+    protected processCreateFunction(response: Response): Promise<void> {
+        const status = response.status;
+        let _headers: any = {}; if (response.headers && response.headers.forEach) { response.headers.forEach((v: any, k: any) => _headers[k] = v); };
+        if (status === 200) {
+            return response.text().then((_responseText) => {
+            return;
+            });
+        } else if (status !== 200 && status !== 204) {
+            return response.text().then((_responseText) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            });
+        }
+        return Promise.resolve<void>(null as any);
+    }
+}
+
 export class KnowledgeService {
     private http: { fetch(url: RequestInfo, init?: RequestInit): Promise<Response> };
     private baseUrl: string;
@@ -642,7 +691,7 @@ export class KnowledgeService {
      * @param body (optional) 
      * @return Success
      */
-    createDetails(body: ICreateKnowledgeDetailsInput | undefined): Promise<void> {
+    createDetails(body: CreateKnowledgeDetailsInput | undefined): Promise<void> {
         let url_ = this.baseUrl + "/api/Knowledge/CreateDetails";
         url_ = url_.replace(/[?&]$/, "");
 
@@ -2024,24 +2073,16 @@ export interface ICreateKnowledgeBasesInput {
     model?: string | undefined;
     embeddingModel?: string | undefined;
 }
-export enum TrainingPattern {
-    Subsection,
-    QA
-}
 
-export enum ProcessMode {
-    Auto,
-    Custom
-}
 export class CreateKnowledgeDetailsInput implements ICreateKnowledgeDetailsInput {
     fileId?: string;
-    filePath?: string;
+    filePath?: string | undefined;
     knowledgeId?: string;
     maxTokensPerParagraph?: number;
     maxTokensPerLine?: number;
     overlappingTokens?: number;
-    trainingPattern?: TrainingPattern;
-    qAPromptTemplate?: string | undefined;
+    trainingPattern?: TrainingPatternType;
+    qaPromptTemplate?: string | undefined;
 
     constructor(data?: ICreateKnowledgeDetailsInput) {
         if (data) {
@@ -2060,8 +2101,8 @@ export class CreateKnowledgeDetailsInput implements ICreateKnowledgeDetailsInput
             this.maxTokensPerParagraph = _data["maxTokensPerParagraph"];
             this.maxTokensPerLine = _data["maxTokensPerLine"];
             this.overlappingTokens = _data["overlappingTokens"];
-            this.trainingPattern = _data["TrainingPatternType"];
-            this.qAPromptTemplate = _data["qAPromptTemplate"];
+            this.trainingPattern = _data["trainingPattern"];
+            this.qaPromptTemplate = _data["qaPromptTemplate"];
         }
     }
 
@@ -2080,21 +2121,21 @@ export class CreateKnowledgeDetailsInput implements ICreateKnowledgeDetailsInput
         data["maxTokensPerParagraph"] = this.maxTokensPerParagraph;
         data["maxTokensPerLine"] = this.maxTokensPerLine;
         data["overlappingTokens"] = this.overlappingTokens;
-        data["TrainingPatternType"] = this.trainingPattern;
-        data["qAPromptTemplate"] = this.qAPromptTemplate;
+        data["trainingPattern"] = this.trainingPattern;
+        data["qaPromptTemplate"] = this.qaPromptTemplate;
         return data;
     }
 }
 
 export interface ICreateKnowledgeDetailsInput {
     fileId?: string;
-    filePath?: string;
+    filePath?: string | undefined;
     knowledgeId?: string;
     maxTokensPerParagraph?: number;
     maxTokensPerLine?: number;
     overlappingTokens?: number;
-    trainingPattern?: TrainingPattern;
-    qAPromptTemplate?: string | undefined;
+    trainingPattern?: TrainingPatternType;
+    qaPromptTemplate?: string | undefined;
 }
 
 export class CreateUserInput implements ICreateUserInput {
@@ -2187,6 +2228,310 @@ export class DisableInputDto implements IDisableInputDto {
 export interface IDisableInputDto {
     id?: string;
     disable?: boolean;
+}
+
+export class FastWikiFunctionCallInput implements IFastWikiFunctionCallInput {
+    name?: string | undefined;
+    description?: string | undefined;
+    content?: string | undefined;
+    parameters?: FunctionItemDto[] | undefined;
+    items?: FunctionItemDto[] | undefined;
+    imports?: string[] | undefined;
+    main?: string | undefined;
+
+    constructor(data?: IFastWikiFunctionCallInput) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.name = _data["name"];
+            this.description = _data["description"];
+            this.content = _data["content"];
+            if (Array.isArray(_data["parameters"])) {
+                this.parameters = [] as any;
+                for (let item of _data["parameters"])
+                    this.parameters!.push(FunctionItemDto.fromJS(item));
+            }
+            if (Array.isArray(_data["items"])) {
+                this.items = [] as any;
+                for (let item of _data["items"])
+                    this.items!.push(FunctionItemDto.fromJS(item));
+            }
+            if (Array.isArray(_data["imports"])) {
+                this.imports = [] as any;
+                for (let item of _data["imports"])
+                    this.imports!.push(item);
+            }
+            this.main = _data["main"];
+        }
+    }
+
+    static fromJS(data: any): FastWikiFunctionCallInput {
+        data = typeof data === 'object' ? data : {};
+        let result = new FastWikiFunctionCallInput();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["name"] = this.name;
+        data["description"] = this.description;
+        data["content"] = this.content;
+        if (Array.isArray(this.parameters)) {
+            data["parameters"] = [];
+            for (let item of this.parameters)
+                data["parameters"].push(item.toJSON());
+        }
+        if (Array.isArray(this.items)) {
+            data["items"] = [];
+            for (let item of this.items)
+                data["items"].push(item.toJSON());
+        }
+        if (Array.isArray(this.imports)) {
+            data["imports"] = [];
+            for (let item of this.imports)
+                data["imports"].push(item);
+        }
+        data["main"] = this.main;
+        return data;
+    }
+}
+
+export interface IFastWikiFunctionCallInput {
+    name?: string | undefined;
+    description?: string | undefined;
+    content?: string | undefined;
+    parameters?: FunctionItemDto[] | undefined;
+    items?: FunctionItemDto[] | undefined;
+    imports?: string[] | undefined;
+    main?: string | undefined;
+}
+
+export class FileStorage implements IFileStorage {
+    id?: string;
+    creationTime?: Date;
+    creatorId?: string | undefined;
+    lastModificationTime?: Date | undefined;
+    lastModifierId?: string | undefined;
+    isDeleted?: boolean;
+    deletionTime?: Date | undefined;
+    deleterUserId?: string | undefined;
+    name?: string | undefined;
+    path?: string | undefined;
+    size?: number;
+    isCompression?: boolean;
+    fullName?: string | undefined;
+    type?: string | undefined;
+
+    constructor(data?: IFileStorage) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.id = _data["id"];
+            this.creationTime = _data["creationTime"] ? new Date(_data["creationTime"].toString()) : <any>undefined;
+            this.creatorId = _data["creatorId"];
+            this.lastModificationTime = _data["lastModificationTime"] ? new Date(_data["lastModificationTime"].toString()) : <any>undefined;
+            this.lastModifierId = _data["lastModifierId"];
+            this.isDeleted = _data["isDeleted"];
+            this.deletionTime = _data["deletionTime"] ? new Date(_data["deletionTime"].toString()) : <any>undefined;
+            this.deleterUserId = _data["deleterUserId"];
+            this.name = _data["name"];
+            this.path = _data["path"];
+            this.size = _data["size"];
+            this.isCompression = _data["isCompression"];
+            this.fullName = _data["fullName"];
+            this.type = _data["type"];
+        }
+    }
+
+    static fromJS(data: any): FileStorage {
+        data = typeof data === 'object' ? data : {};
+        let result = new FileStorage();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
+        data["creationTime"] = this.creationTime ? this.creationTime.toISOString() : <any>undefined;
+        data["creatorId"] = this.creatorId;
+        data["lastModificationTime"] = this.lastModificationTime ? this.lastModificationTime.toISOString() : <any>undefined;
+        data["lastModifierId"] = this.lastModifierId;
+        data["isDeleted"] = this.isDeleted;
+        data["deletionTime"] = this.deletionTime ? this.deletionTime.toISOString() : <any>undefined;
+        data["deleterUserId"] = this.deleterUserId;
+        data["name"] = this.name;
+        data["path"] = this.path;
+        data["size"] = this.size;
+        data["isCompression"] = this.isCompression;
+        data["fullName"] = this.fullName;
+        data["type"] = this.type;
+        return data;
+    }
+}
+
+export interface IFileStorage {
+    id?: string;
+    creationTime?: Date;
+    creatorId?: string | undefined;
+    lastModificationTime?: Date | undefined;
+    lastModifierId?: string | undefined;
+    isDeleted?: boolean;
+    deletionTime?: Date | undefined;
+    deleterUserId?: string | undefined;
+    name?: string | undefined;
+    path?: string | undefined;
+    size?: number;
+    isCompression?: boolean;
+    fullName?: string | undefined;
+    type?: string | undefined;
+}
+
+export class FunctionItemDto implements IFunctionItemDto {
+    key?: string | undefined;
+    value?: string | undefined;
+
+    constructor(data?: IFunctionItemDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.key = _data["key"];
+            this.value = _data["value"];
+        }
+    }
+
+    static fromJS(data: any): FunctionItemDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new FunctionItemDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["key"] = this.key;
+        data["value"] = this.value;
+        return data;
+    }
+}
+
+export interface IFunctionItemDto {
+    key?: string | undefined;
+    value?: string | undefined;
+}
+
+export class KnowledgeBase implements IKnowledgeBase {
+    id?: string;
+    creationTime?: Date;
+    creatorId?: string | undefined;
+    lastModificationTime?: Date | undefined;
+    lastModifierId?: string | undefined;
+    isDeleted?: boolean;
+    deletionTime?: Date | undefined;
+    deleterUserId?: string | undefined;
+    icon?: string | undefined;
+    name?: string | undefined;
+    model?: string | undefined;
+    embeddingModel?: string | undefined;
+    knowledgeBaseDetails?: KnowledgeBaseDetails[] | undefined;
+
+    constructor(data?: IKnowledgeBase) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.id = _data["id"];
+            this.creationTime = _data["creationTime"] ? new Date(_data["creationTime"].toString()) : <any>undefined;
+            this.creatorId = _data["creatorId"];
+            this.lastModificationTime = _data["lastModificationTime"] ? new Date(_data["lastModificationTime"].toString()) : <any>undefined;
+            this.lastModifierId = _data["lastModifierId"];
+            this.isDeleted = _data["isDeleted"];
+            this.deletionTime = _data["deletionTime"] ? new Date(_data["deletionTime"].toString()) : <any>undefined;
+            this.deleterUserId = _data["deleterUserId"];
+            this.icon = _data["icon"];
+            this.name = _data["name"];
+            this.model = _data["model"];
+            this.embeddingModel = _data["embeddingModel"];
+            if (Array.isArray(_data["knowledgeBaseDetails"])) {
+                this.knowledgeBaseDetails = [] as any;
+                for (let item of _data["knowledgeBaseDetails"])
+                    this.knowledgeBaseDetails!.push(KnowledgeBaseDetails.fromJS(item));
+            }
+        }
+    }
+
+    static fromJS(data: any): KnowledgeBase {
+        data = typeof data === 'object' ? data : {};
+        let result = new KnowledgeBase();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
+        data["creationTime"] = this.creationTime ? this.creationTime.toISOString() : <any>undefined;
+        data["creatorId"] = this.creatorId;
+        data["lastModificationTime"] = this.lastModificationTime ? this.lastModificationTime.toISOString() : <any>undefined;
+        data["lastModifierId"] = this.lastModifierId;
+        data["isDeleted"] = this.isDeleted;
+        data["deletionTime"] = this.deletionTime ? this.deletionTime.toISOString() : <any>undefined;
+        data["deleterUserId"] = this.deleterUserId;
+        data["icon"] = this.icon;
+        data["name"] = this.name;
+        data["model"] = this.model;
+        data["embeddingModel"] = this.embeddingModel;
+        if (Array.isArray(this.knowledgeBaseDetails)) {
+            data["knowledgeBaseDetails"] = [];
+            for (let item of this.knowledgeBaseDetails)
+                data["knowledgeBaseDetails"].push(item.toJSON());
+        }
+        return data;
+    }
+}
+
+export interface IKnowledgeBase {
+    id?: string;
+    creationTime?: Date;
+    creatorId?: string | undefined;
+    lastModificationTime?: Date | undefined;
+    lastModifierId?: string | undefined;
+    isDeleted?: boolean;
+    deletionTime?: Date | undefined;
+    deleterUserId?: string | undefined;
+    icon?: string | undefined;
+    name?: string | undefined;
+    model?: string | undefined;
+    embeddingModel?: string | undefined;
+    knowledgeBaseDetails?: KnowledgeBaseDetails[] | undefined;
 }
 
 export class KnowledgeBaseDetailVectorQuantityDto implements IKnowledgeBaseDetailVectorQuantityDto {
@@ -2301,6 +2646,106 @@ export interface IKnowledgeBaseDetailVectorQuantityDtoPagedResultDto {
     pageNumber?: number;
 }
 
+export class KnowledgeBaseDetails implements IKnowledgeBaseDetails {
+    id?: string;
+    creationTime?: Date;
+    creatorId?: string | undefined;
+    lastModificationTime?: Date | undefined;
+    lastModifierId?: string | undefined;
+    isDeleted?: boolean;
+    deletionTime?: Date | undefined;
+    deleterUserId?: string | undefined;
+    state?: KnowledgeBaseQuantizationState;
+    maxTokensPerParagraph?: number;
+    maxTokensPerLine?: number;
+    overlappingTokens?: number;
+    trainingPattern?: TrainingPatternType;
+    qaPromptTemplate?: string | undefined;
+    file?: FileStorage;
+    dataCount?: number;
+    knowledgeBase?: KnowledgeBase;
+
+    constructor(data?: IKnowledgeBaseDetails) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.id = _data["id"];
+            this.creationTime = _data["creationTime"] ? new Date(_data["creationTime"].toString()) : <any>undefined;
+            this.creatorId = _data["creatorId"];
+            this.lastModificationTime = _data["lastModificationTime"] ? new Date(_data["lastModificationTime"].toString()) : <any>undefined;
+            this.lastModifierId = _data["lastModifierId"];
+            this.isDeleted = _data["isDeleted"];
+            this.deletionTime = _data["deletionTime"] ? new Date(_data["deletionTime"].toString()) : <any>undefined;
+            this.deleterUserId = _data["deleterUserId"];
+            this.state = _data["state"];
+            this.maxTokensPerParagraph = _data["maxTokensPerParagraph"];
+            this.maxTokensPerLine = _data["maxTokensPerLine"];
+            this.overlappingTokens = _data["overlappingTokens"];
+            this.trainingPattern = _data["trainingPattern"];
+            this.qaPromptTemplate = _data["qaPromptTemplate"];
+            this.file = _data["file"] ? FileStorage.fromJS(_data["file"]) : <any>undefined;
+            this.dataCount = _data["dataCount"];
+            this.knowledgeBase = _data["knowledgeBase"] ? KnowledgeBase.fromJS(_data["knowledgeBase"]) : <any>undefined;
+        }
+    }
+
+    static fromJS(data: any): KnowledgeBaseDetails {
+        data = typeof data === 'object' ? data : {};
+        let result = new KnowledgeBaseDetails();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
+        data["creationTime"] = this.creationTime ? this.creationTime.toISOString() : <any>undefined;
+        data["creatorId"] = this.creatorId;
+        data["lastModificationTime"] = this.lastModificationTime ? this.lastModificationTime.toISOString() : <any>undefined;
+        data["lastModifierId"] = this.lastModifierId;
+        data["isDeleted"] = this.isDeleted;
+        data["deletionTime"] = this.deletionTime ? this.deletionTime.toISOString() : <any>undefined;
+        data["deleterUserId"] = this.deleterUserId;
+        data["state"] = this.state;
+        data["maxTokensPerParagraph"] = this.maxTokensPerParagraph;
+        data["maxTokensPerLine"] = this.maxTokensPerLine;
+        data["overlappingTokens"] = this.overlappingTokens;
+        data["trainingPattern"] = this.trainingPattern;
+        data["qaPromptTemplate"] = this.qaPromptTemplate;
+        data["file"] = this.file ? this.file.toJSON() : <any>undefined;
+        data["dataCount"] = this.dataCount;
+        data["knowledgeBase"] = this.knowledgeBase ? this.knowledgeBase.toJSON() : <any>undefined;
+        return data;
+    }
+}
+
+export interface IKnowledgeBaseDetails {
+    id?: string;
+    creationTime?: Date;
+    creatorId?: string | undefined;
+    lastModificationTime?: Date | undefined;
+    lastModifierId?: string | undefined;
+    isDeleted?: boolean;
+    deletionTime?: Date | undefined;
+    deleterUserId?: string | undefined;
+    state?: KnowledgeBaseQuantizationState;
+    maxTokensPerParagraph?: number;
+    maxTokensPerLine?: number;
+    overlappingTokens?: number;
+    trainingPattern?: TrainingPatternType;
+    qaPromptTemplate?: string | undefined;
+    file?: FileStorage;
+    dataCount?: number;
+    knowledgeBase?: KnowledgeBase;
+}
+
 export class KnowledgeBaseDetailsDto implements IKnowledgeBaseDetailsDto {
     state?: KnowledgeBaseQuantizationState;
     maxTokensPerParagraph?: number;
@@ -2309,6 +2754,8 @@ export class KnowledgeBaseDetailsDto implements IKnowledgeBaseDetailsDto {
     trainingPattern?: TrainingPatternType;
     qaPromptTemplate?: string | undefined;
     dataCount?: number;
+    file?: FileStorage;
+    knowledgeBase?: KnowledgeBase;
     lastModifierId?: string;
     lastModificationTime?: Date | undefined;
 
@@ -2330,6 +2777,8 @@ export class KnowledgeBaseDetailsDto implements IKnowledgeBaseDetailsDto {
             this.trainingPattern = _data["trainingPattern"];
             this.qaPromptTemplate = _data["qaPromptTemplate"];
             this.dataCount = _data["dataCount"];
+            this.file = _data["file"] ? FileStorage.fromJS(_data["file"]) : <any>undefined;
+            this.knowledgeBase = _data["knowledgeBase"] ? KnowledgeBase.fromJS(_data["knowledgeBase"]) : <any>undefined;
             this.lastModifierId = _data["lastModifierId"];
             this.lastModificationTime = _data["lastModificationTime"] ? new Date(_data["lastModificationTime"].toString()) : <any>undefined;
         }
@@ -2351,6 +2800,8 @@ export class KnowledgeBaseDetailsDto implements IKnowledgeBaseDetailsDto {
         data["trainingPattern"] = this.trainingPattern;
         data["qaPromptTemplate"] = this.qaPromptTemplate;
         data["dataCount"] = this.dataCount;
+        data["file"] = this.file ? this.file.toJSON() : <any>undefined;
+        data["knowledgeBase"] = this.knowledgeBase ? this.knowledgeBase.toJSON() : <any>undefined;
         data["lastModifierId"] = this.lastModifierId;
         data["lastModificationTime"] = this.lastModificationTime ? this.lastModificationTime.toISOString() : <any>undefined;
         return data;
@@ -2365,6 +2816,8 @@ export interface IKnowledgeBaseDetailsDto {
     trainingPattern?: TrainingPatternType;
     qaPromptTemplate?: string | undefined;
     dataCount?: number;
+    file?: FileStorage;
+    knowledgeBase?: KnowledgeBase;
     lastModifierId?: string;
     lastModificationTime?: Date | undefined;
 }
@@ -2746,6 +3199,7 @@ export interface ISearchVectorQuantityDto {
 
 export enum TrainingPatternType {
     _0 = 0,
+    _1 = 1,
 }
 
 export class UpdateChatApplicationInputDto implements IUpdateChatApplicationInputDto {
@@ -3075,29 +3529,6 @@ export class ApiException extends Error {
     static isApiException(obj: any): obj is ApiException {
         return obj.isApiException === true;
     }
-}
-export interface WikiDto {
-    id: number;
-    icon: string;
-    name: string;
-    model: string;
-    embeddingModel: string;
-}
-
-
-export enum WikiQuantizationState {
-    None = 0,
-    Accomplish,
-    Fail
-}
-
-export interface WikiDetailVectorQuantityDto {
-    id: string;
-    content: string;
-    document_Id: string;
-    wikiDetailId: string;
-    fileId: string;
-    index: number;
 }
 
 function throwException(message: string, status: number, response: string, headers: { [key: string]: any; }, result?: any): any {

@@ -3,9 +3,8 @@ import { Form, Input, Button, message, AutoComplete, Upload ,FormInstance } from
 import { useEffect, useState,useRef } from "react";
 import { getModels } from "../../../store/Model";
 import { PlusOutlined } from '@ant-design/icons';
-import { UploadFile } from "../../../services/StorageService";
 import { KnowledgeService } from "../../../services/service-proxies";
-
+import { UploadFile } from "../../../services/StorageService";
 
 interface ICreateAppProps {
     visible: boolean;
@@ -59,6 +58,7 @@ export function CreateApp(props: ICreateAppProps) {
         getModels()
             .then((models) => {
                 setModel(models.chatModel.map((item) => {
+                    
                     return { label: item.label, value: item.value }
                 }));
                 setEmbeddingModel(models.embeddingModel.map((item) => {
@@ -76,7 +76,8 @@ export function CreateApp(props: ICreateAppProps) {
             }
             const response = await UploadFile(fileList[0].originFileObj)
             //debugger;
-            values.icon = response.id;
+            values.icon = response.path;
+            //debugger;
             await knowledgeService.create(values);
             message.success('创建成功');
             props.onSuccess();

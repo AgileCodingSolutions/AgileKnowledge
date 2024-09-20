@@ -5,7 +5,6 @@ import { Flexbox } from 'react-layout-kit';
 import { Outlet } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 import { Dropdown, message } from "antd";
-
 const DesktopLayout = memo(() => {
   const [tab, setTab] = useState<string>('chat');
   const navigate = useNavigate();

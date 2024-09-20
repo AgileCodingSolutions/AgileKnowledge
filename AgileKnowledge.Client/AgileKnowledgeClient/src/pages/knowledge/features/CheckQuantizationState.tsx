@@ -1,9 +1,9 @@
 import { Table, Button, Dropdown, MenuProps, message, Select } from 'antd';
 import { useEffect, useState } from 'react';
-import { KnowledgeBasesDto, KnowledgeService } from '../../../services/service-proxies';
+import {  KnowledgeService } from '../../../services/service-proxies';
 
-import { WikiQuantizationState } from '../../../services/service-proxies';
-
+import { KnowledgeBaseQuantizationState } from '../../../services/service-proxies';
+//import WikiDetailFile from '../features/WikiDetailFile'
 interface IWikiDataProps {
     id: string;
     onChagePath(key: string): void;
@@ -11,7 +11,7 @@ interface IWikiDataProps {
 
 export default function WikiData({ id, onChagePath }: IWikiDataProps) {
 
-
+var knowledgeService = new KnowledgeService();
     const columns = [
         {
             title: '文件名',
@@ -131,7 +131,8 @@ export default function WikiData({ id, onChagePath }: IWikiDataProps) {
         keyword: '',
         page: 1,
         pageSize: 10,
-        state: null as WikiQuantizationState | null
+        filter : '',
+        state: undefined as KnowledgeBaseQuantizationState | undefined
     });
 
     const items: MenuProps['items'] = [
@@ -210,11 +211,19 @@ export default function WikiData({ id, onChagePath }: IWikiDataProps) {
 
     async function loadingData() {
         try {
-            //const result = await GetWikiDetailsList(id, input.keyword, input.page, input.pageSize, input.state);
-            // setData(result.result);
-            // setTotal(result.total);
+            const result = await knowledgeService.getDetailsList(id, input.state, input.filter ,input.keyword, input.page, input.pageSize);
+            console.log(result);
+            // const updatedItems = result.items!.map((item: UserDto, index : number) => {
+            //     return {
+            //         ...item,
+            //         key: index + 1
+            //     };
+            // });
+            //debugger;
+            setData(result as any);
+            setTotal(result.totalCount!);
         } catch (error) {
-
+                 
         }
     }
 
@@ -244,7 +253,7 @@ export default function WikiData({ id, onChagePath }: IWikiDataProps) {
                     marginRight: 16,
                     float: 'right'
                 }}
-                onChange={(v: WikiQuantizationState | null) => {
+                onChange={(v: KnowledgeBaseQuantizationState | undefined) => {
                     setInput({
                         ...input,
                         state: v
@@ -252,9 +261,9 @@ export default function WikiData({ id, onChagePath }: IWikiDataProps) {
                 }}
                 options={[
                     { value: null, label: '全部' },
-                    { value: WikiQuantizationState.None, label: '处理中' },
-                    { value: WikiQuantizationState.Accomplish, label: '完成' },
-                    { value: WikiQuantizationState.Fail, label: '失败' },
+                    { value: KnowledgeBaseQuantizationState._0, label: '处理中' },
+                    { value: KnowledgeBaseQuantizationState._1, label: '完成' },
+                    { value: KnowledgeBaseQuantizationState._2, label: '失败' },
                 ]}
             />
         </header>

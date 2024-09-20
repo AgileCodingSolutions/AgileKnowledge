@@ -5,6 +5,7 @@ import { message, Button, Pagination } from 'antd';
 import { useNavigate } from 'react-router-dom';
 import { DeleteOutlined } from '@ant-design/icons';
 import { KnowledgeBasesDto, KnowledgeService } from '../../../services/service-proxies';
+import { config } from '../../../config';
 
 
 interface IAppListProps {
@@ -32,7 +33,8 @@ export function AppList(props: IAppListProps) {
     const render = (item: KnowledgeBasesDto) => (
         <Flexbox align={'flex-start'} gap={8} horizontal style={{ padding: 16, height: 100 }}>
 
-            <Avatar size={50} src={item.icon} style={{ flex: 'none' }} />
+            <Avatar size={50} src={config.FAST_API_URL+'/'+item.icon} style={{ flex: 'none' }} />
+            
             <Flexbox onClick={() => {
                 openWikiDetail(item.id!);
             }}>
@@ -42,6 +44,7 @@ export function AppList(props: IAppListProps) {
                     {item.model}
                 </div>
             </Flexbox>
+            
             <Button
                 style={{
                     float: 'inline-end',
@@ -53,7 +56,7 @@ export function AppList(props: IAppListProps) {
             />
         </Flexbox>
     )
-
+    
     async function deleteWiki(id: string) {
         await knowledgeService.delete(id);
         message.success('删除成功');
@@ -66,12 +69,13 @@ export function AppList(props: IAppListProps) {
 
     function openWikiDetail(id: string) {
         //message.success('111');
-        navigate(`/knowledge/${id}`);
+        navigate(`/KnowledgeDetail/${id}`);
     }
 
     async function loadingData() {
         try {
             const data = await knowledgeService.getList(input.keyword,"", input.page, input.pageSize);
+            console.log(data);
             setData(data.items!);
             setTotal(data.totalCount!);
         } catch (error) {

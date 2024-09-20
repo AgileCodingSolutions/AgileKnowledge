@@ -20,6 +20,10 @@ const router = createBrowserRouter([{
   element: <MainLayout />,
   children: [
     {
+      path: '/chat', element: <Suspense fallback={'加载中'}>
+      </Suspense>
+    },
+    {
       path: '/app', element: <Suspense fallback={'加载中'}>
         <App />
       </Suspense>
@@ -35,7 +39,7 @@ const router = createBrowserRouter([{
       </Suspense>
     },
     {
-      path: '/knowledge/:id', element: <Suspense fallback={'加载中'}>
+      path: '/KnowledgeDetail/:id', element: <Suspense fallback={'加载中'}>
         <KnowledgeDetail />
       </Suspense>
     },

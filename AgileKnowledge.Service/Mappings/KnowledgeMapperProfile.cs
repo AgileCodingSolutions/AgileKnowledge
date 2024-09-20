@@ -1,4 +1,5 @@
 ﻿using AgileKnowledge.Service.Domain.Enities;
+using AgileKnowledge.Service.Domain.Entitys;
 using AgileKnowledge.Service.Mappings.ChatApplications;
 using AgileKnowledge.Service.Mappings.KnowledgeBases;
 using AgileKnowledge.Service.Mappings.Users;
@@ -16,8 +17,9 @@ namespace AgileKnowledge.Service.Mappings
 
 			CreateMap<ChatApplication, ChatApplicationDto>();
 
+            CreateMap<KnowledgeBaseDetails, KnowledgeBaseDetailsDto>();
 
 
-		}
-	}
+        }
+    }
 }

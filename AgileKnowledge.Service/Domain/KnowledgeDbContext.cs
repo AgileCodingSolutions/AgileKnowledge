@@ -1,6 +1,7 @@
 ﻿using System.Linq.Expressions;
 using AgileKnowledge.Service.Domain.BaseEntity;
 using AgileKnowledge.Service.Domain.Enities;
+using AgileKnowledge.Service.Domain.Entitys;
 using AgileKnowledge.Service.Helper;
 
 using Microsoft.EntityFrameworkCore;
@@ -21,6 +22,7 @@ namespace AgileKnowledge.Service.Domain
 
 		public DbSet<KnowledgeBase> KnowledgeBases { get; set; }
 		public DbSet<KnowledgeBaseDetails> KnowledgeBaseDetails { get; set; }
+
 
 
 		public DbSet<ChatApplication> ChatApplications { get; set; }

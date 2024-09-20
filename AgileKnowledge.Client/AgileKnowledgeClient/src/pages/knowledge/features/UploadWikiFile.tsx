@@ -1,15 +1,14 @@
-import { UploadFile } from "../../../services/StorageService";
 
+import { UploadFile } from "../../../services/StorageService";
 import { Button, Steps, Upload, UploadProps, Table, Progress, Radio, Input, message, MenuProps, Dropdown } from 'antd';
 import { useState } from 'react';
 import { InboxOutlined, CloseOutlined } from '@ant-design/icons';
 import styled from 'styled-components';
 import { bytesToSize } from '../../../utils/stringHelper';
-import { ProcessMode, TrainingPattern } from '../../../services/service-proxies';
-import { UploadFile as FileService } from '../../../services/StorageService';
+import { CreateKnowledgeDetailsInput, TrainingPatternType } from '../../../services/service-proxies';
 import { KnowledgeService } from '../../../services/service-proxies';
 import { TextArea } from '@lobehub/ui';
-import { json } from "react-router-dom";
+//import { json } from "react-router-dom";
 
 
 const FileItem = styled.div`/
@@ -39,8 +38,7 @@ export default function UploadWikiFile({ id, onChagePath }: IUploadWikiFileProps
     const [current, setCurrent] = useState(0);
     // const [uploading, setUploading] = useState(false);
     const [fileList, setFileList] = useState<any[]>([]);
-    const [processMode, setProcessMode] = useState(ProcessMode.Auto);
-    const [trainingPattern, setTrainingPattern] = useState(TrainingPattern.Subsection);
+    const [trainingPattern, setTrainingPattern] = useState(TrainingPatternType._1);
     const [maxTokensPerParagraph, setMaxTokensPerParagraph] = useState(1000); // 每个段落标记的最大数量。当对文档进行分区时，每个分区通常包含一个段落。
     const [maxTokensPerLine, setMaxTokensPerLine] = useState(300); // 每行，也就是每个句子的最大标记数。当分割一个文本块时，文本将被分割成句子，然后被分组成段落。注意，这适用于任何文本格式，包括表格、代码、聊天记录、日志文件等。
     const [overlappingTokens, setOverlappingTokens] = useState(100); // 重叠标记数。当对文档进行分区时，每个分区的开始和结束部分将重叠。这有助于确保模型在分区之间保持上下文一致性。
@@ -127,22 +125,22 @@ export default function UploadWikiFile({ id, onChagePath }: IUploadWikiFileProps
 
     async function Upload(file: any) {
 
-        const fileItem = await FileService(file);
+        const fileItem = await UploadFile(file);
         file.progress = 100;
 
         setFileList([...fileList]);
 
     
-        await knowledgeService.createDetails({
+        await knowledgeService.createDetails(new CreateKnowledgeDetailsInput({
             fileId: fileItem.id,
             filePath: fileItem.path,
             knowledgeId: id,
             maxTokensPerParagraph: maxTokensPerParagraph,
             maxTokensPerLine: maxTokensPerLine,
             overlappingTokens: overlappingTokens,
-            qAPromptTemplate: qAPromptTemplate,
+            qaPromptTemplate: qAPromptTemplate,
             trainingPattern: trainingPattern,
-        })
+        }))
 
         file.dataProgress = 100;
 
@@ -238,75 +236,24 @@ export default function UploadWikiFile({ id, onChagePath }: IUploadWikiFileProps
                         marginBottom: 20
                     }} onChange={(v: any) => {
                         const value = Number(v.target.value);
-                        setTrainingPattern(value as TrainingPattern);
+                        setTrainingPattern(value as TrainingPatternType);
                     }} value={trainingPattern}>
                         <Radio style={{
                             border: '1px solid #d9d9d9',
                             borderRadius: 8,
                             padding: 10,
                             marginRight: 10
-                        }} value={TrainingPattern.Subsection}>文本拆分</Radio>
+                        }} value={TrainingPatternType._0}>文本拆分</Radio>
                         <Radio style={{
                             border: '1px solid #d9d9d9',
                             borderRadius: 8,
                             padding: 10,
                             marginRight: 10
-                        }} value={TrainingPattern.QA}>QA问答拆分</Radio>
+                        }} value={TrainingPatternType._1}>QA问答拆分</Radio>
                     </Radio.Group>
+                    
                     {
-                        trainingPattern === TrainingPattern.Subsection && <div>
-                            <span>处理模式：</span>
-                            <Radio.Group onChange={(v: any) => {
-                                const value = Number(v.target.value);
-                                setProcessMode(value as ProcessMode);
-                            }} value={processMode}>
-                                <Radio value={ProcessMode.Auto}>自动</Radio>
-                                <Radio value={ProcessMode.Custom}>自定义</Radio>
-                            </Radio.Group>
-                            {
-                                processMode === ProcessMode.Custom && <>
-                                    <div style={{
-                                        marginTop: 10
-                                    }}>
-                                        <span>段落最大Token：</span>
-                                        <Input
-                                            value={maxTokensPerParagraph}
-                                            onChange={(e: any) => {
-                                                setMaxTokensPerParagraph(Number(e.target.value));
-                                            }}
-                                            style={{
-                                                width: 200,
-                                                marginRight: 10
-                                            }} />
-
-                                        <span>每行最大Tokens：</span>
-                                        <Input
-                                            value={maxTokensPerLine}
-                                            onChange={(e: any) => {
-                                                setMaxTokensPerLine(Number(e.target.value));
-                                            }}
-                                            style={{
-                                                width: 200,
-                                                marginRight: 10
-                                            }} />
-                                        <span>段落之间重叠标记的数目：</span>
-                                        <Input
-                                            value={overlappingTokens}
-                                            onChange={(e: any) => {
-                                                setOverlappingTokens(Number(e.target.value));
-                                            }}
-                                            style={{
-                                                width: 200,
-                                                marginRight: 10
-                                            }} />
-                                    </div>
-                                </>
-                            }
-
-                        </div>
-                    }
-                    {
-                        trainingPattern === TrainingPattern.QA && <>
+                        trainingPattern === TrainingPatternType._1 && <>
                             <span>QA问答模板：</span>
                             <TextArea value={qAPromptTemplate} onChange={(v) => {
                                 setQAPromptTemplate(v.target.value);

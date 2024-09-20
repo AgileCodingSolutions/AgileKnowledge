@@ -2,6 +2,7 @@
 {
 	public enum TrainingPatternType
 	{
-		QA = 0
+        Subsection = 0,
+        QA = 1
 	}
 }

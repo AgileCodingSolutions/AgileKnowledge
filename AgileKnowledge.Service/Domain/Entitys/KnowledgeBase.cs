@@ -1,4 +1,5 @@
 ﻿using AgileKnowledge.Service.Domain.BaseEntity;
+using AgileKnowledge.Service.Domain.Entitys;
 
 namespace AgileKnowledge.Service.Domain.Enities
 {
@@ -9,7 +10,7 @@ namespace AgileKnowledge.Service.Domain.Enities
         public string Model { get; set; }
         public string EmbeddingModel { get; set; }
         public virtual ICollection<KnowledgeBaseDetails> KnowledgeBaseDetails { get; set; }
-
+        
         protected KnowledgeBase()
         {
         }
