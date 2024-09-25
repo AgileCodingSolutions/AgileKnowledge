@@ -3,11 +3,11 @@ import { memo, useEffect, useState } from "react";
 import type { TableProps } from 'antd';
 import { Button, Table, message, Dropdown, MenuProps } from 'antd';
 import styled from 'styled-components';
-//import CreateApplication from "./CreateApplication";
+import CreateApplication from "./CreateApplication";
 //import { GetChatShareList, RemoveChatShare } from "../../../services/ChatApplicationService";
 import { copyToClipboard } from "../../../utils/stringHelper";
 import { config } from "../../../config";
-
+import  {ChatApplicationService,PostShareDto} from '../../../services/service-proxies'
 
 const Title = styled.div`
     font-size: 30px;
@@ -18,9 +18,9 @@ const Title = styled.div`
 interface IReleaseApplicationProps {
     id: string;
 }
-
+ var chatApplicationService = new ChatApplicationService();
 export default memo((props: IReleaseApplicationProps) => {
-    const columns: TableProps<ChatShareDto>['columns'] = [
+    const columns: TableProps<PostShareDto>['columns'] = [
         {
             title: '文件名',
             dataIndex: 'name',
@@ -47,7 +47,7 @@ export default memo((props: IReleaseApplicationProps) => {
                 if (text === -1) {
                     return '无限制';
                 }
-                return text - item.usedToken;
+                //return text - item.usedToken;
             }
         },
         {
@@ -77,7 +77,7 @@ export default memo((props: IReleaseApplicationProps) => {
                     key: '2',
                     label: '复制Key',
                     onClick: () => {
-                        copyToClipboard(item.apiKey)
+                        //copyToClipboard(item.apiKey)
                         message.success('复制APIKey成功');
                     }
                 })
@@ -122,10 +122,11 @@ export default memo((props: IReleaseApplicationProps) => {
         },
     ];
 
-    const [data, setData] = useState<ChatShareDto[]>([]);
+    const [data, setData] = useState<PostShareDto[]>([]);
+    
     const [visible, setVisible] = useState(false);
     const [input, setInput] = useState({
-        page: 1,
+        pageNumber: 1,
         pageSize: 10,
         chatApplicationId: props.id
     } as any);
@@ -148,10 +149,10 @@ export default memo((props: IReleaseApplicationProps) => {
     }
 
     function loadingData() {
-        GetChatShareList(input.chatApplicationId, input.page, input.pageSize)
-            .then((result) => {
-                setData(result.result);
-                setTotal(result.total);
+         chatApplicationService.getPostShareList(input.chatApplicationId,'','', input.pageNumber, input.pageSize,)
+            .then((data) => {
+                setData(data.items!);
+                setTotal(data.totalCount!);
             })
     }
 

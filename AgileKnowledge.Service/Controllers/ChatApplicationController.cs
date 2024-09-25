@@ -6,8 +6,10 @@ using AgileKnowledge.Service.Helper;
 using AgileKnowledge.Service.Mappings;
 using AgileKnowledge.Service.Mappings.ChatApplications;
 using AgileKnowledge.Service.Mappings.KnowledgeBases;
+using AgileKnowledge.Service.Migrations;
 using AgileKnowledge.Service.Service;
 using AutoMapper;
+using DocumentFormat.OpenXml.Office2010.Excel;
 using DocumentFormat.OpenXml.Vml;
 
 using Microsoft.AspNetCore.Http;
@@ -136,5 +138,60 @@ namespace AgileKnowledge.Service.Controllers
 			await _dbContext.SaveChangesAsync();
 		}
 
-	}
+
+
+		[HttpGet]
+		public async Task<PagedResultDto<PostShareDto>> GetPostShareListAsync([FromQuery] PostShareList input)
+		{
+            if (input.ChatApplicationId == Guid.Empty)
+            {
+                throw new ArgumentException("Chat application ID cannot be empty.", nameof(input.ChatApplicationId));
+            }
+            var query = _dbContext.ChatDialogs.WhereIf(!input.ChatApplicationId.Equals(Guid.Empty),
+                x => x.Id == input.ChatApplicationId);
+            var total = query.Count();
+            var list = await query.PageBy(input.PageNumber, input.PageSize).ToListAsync();
+
+            return new PagedResultDto<PostShareDto>(total, _mapper.Map<List<PostShareDto>>(list));
+        }
+
+
+		[HttpPost]
+		public async Task CreatePostShareAsync([FromBody] CreatePostShareInput input)
+		{
+            var entity = new CreatePostShareCommand(input.Name, input.ChatApplicationId,input.Expires,input.AvailableToken,input.AvailableQuantity);
+
+            await _dbContext.AddAsync(entity);
+            await _dbContext.SaveChangesAsync();
+        }
+
+		[HttpDelete]
+		public async Task DeleteChatDialogAsync(Guid id)
+		{
+            var entity = await _dbContext.ChatDialogs.Where(x => x.Id == id).FirstOrDefaultAsync();
+
+            _dbContext.Remove(entity);
+
+            await _dbContext.SaveChangesAsync();
+        }
+
+
+		[HttpGet]
+        public async Task<PagedResultDto<CreateChatDialogHistoryInputDto>> GetChatDialogHistoryAsync([FromQuery] ChatAppHistory input)
+        {
+            if (input.ChatDialogId == Guid.Empty)
+            {
+                throw new ArgumentException("Chat application ID cannot be empty.", nameof(input.ChatDialogId));
+            }
+            var query = _dbContext.ChatDialogHistorys.WhereIf(!input.ChatDialogId.Equals(Guid.Empty),
+                x => x.ChatDialog.Id == input.ChatDialogId);
+
+            var total = query.Count();
+
+            var list = await query.PageBy(input.PageNumber, input.PageSize).ToListAsync();
+
+			return new PagedResultDto<CreateChatDialogHistoryInputDto>(total, _mapper.Map<List<CreateChatDialogHistoryInputDto>>(list));
+        }
+
+    }
 }

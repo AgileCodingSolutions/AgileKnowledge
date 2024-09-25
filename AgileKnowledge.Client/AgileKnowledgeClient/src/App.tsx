@@ -11,6 +11,7 @@ import AppDetail from './pages/app-detail/page';
 import Knowledge from './pages/knowledge/page';
 import { config } from './config';
 import { message } from 'antd';
+import Chat from './pages/chat/(desktop)/index';
 import KnowledgeDetail from './pages/knowledge/features/KnowledgeDetail'
 const router = createBrowserRouter([{
   path: '/',
@@ -21,6 +22,7 @@ const router = createBrowserRouter([{
   children: [
     {
       path: '/chat', element: <Suspense fallback={'加载中'}>
+      <Chat/>
       </Suspense>
     },
     {

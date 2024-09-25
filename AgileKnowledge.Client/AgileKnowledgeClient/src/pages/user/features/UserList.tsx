@@ -27,7 +27,7 @@ export default function UserList({
             page: page,
             pageSize: pageSize,
         });
-        
+        await loadingData();
     }
 
     async function ResetLoading(){
@@ -110,14 +110,14 @@ export default function UserList({
                         console.log('编辑');
                     }
                 })
-                if (item.role === RoleType._0) {
+                if (item.role === RoleType._1) {
                     items.push({
                         key: '4',
                         label: '取消管理员',
                         onClick: async () => {
                             userService.changeRole(new ChangeRoleInputDto({
                                 id:item.id,
-                                role: RoleType._1
+                                role: RoleType._0
                             }));
                             message.success('取消成功');
                             await ResetLoading();
@@ -159,7 +159,7 @@ export default function UserList({
                         onClick: async () => {
                             await userService.changeRole(new ChangeRoleInputDto({
                                 id: item.id,
-                                role: RoleType._0
+                                role: RoleType._1
                             }));
                             message.success('设置成功');
                             await ResetLoading();

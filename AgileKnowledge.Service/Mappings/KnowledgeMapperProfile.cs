@@ -19,7 +19,11 @@ namespace AgileKnowledge.Service.Mappings
 
             CreateMap<KnowledgeBaseDetails, KnowledgeBaseDetailsDto>();
 
+			CreateMap<ChatApplication, PostShareDto>();
 
+			CreateMap<ChatDialog, ChatDialogDto>();
+
+			CreateMap<ChatDialogHistory, CreateChatDialogHistoryInputDto>();
         }
     }
 }

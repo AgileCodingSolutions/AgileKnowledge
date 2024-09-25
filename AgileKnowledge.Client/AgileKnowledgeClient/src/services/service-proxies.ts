@@ -413,6 +413,206 @@ export class ChatApplicationService {
         }
         return Promise.resolve<void>(null as any);
     }
+
+    /**
+     * @param chatApplicationId (optional) 
+     * @param filter (optional) 
+     * @param sorting (optional) 
+     * @param pageNumber (optional) 
+     * @param pageSize (optional) 
+     * @return Success
+     */
+    getPostShareList(chatApplicationId: string | undefined, filter: string | undefined, sorting: string | undefined, pageNumber: number | undefined, pageSize: number | undefined): Promise<PostShareDtoPagedResultDto> {
+        let url_ = this.baseUrl + "/api/ChatApplication/GetPostShareList?";
+        if (chatApplicationId === null)
+            throw new Error("The parameter 'chatApplicationId' cannot be null.");
+        else if (chatApplicationId !== undefined)
+            url_ += "ChatApplicationId=" + encodeURIComponent("" + chatApplicationId) + "&";
+        if (filter === null)
+            throw new Error("The parameter 'filter' cannot be null.");
+        else if (filter !== undefined)
+            url_ += "Filter=" + encodeURIComponent("" + filter) + "&";
+        if (sorting === null)
+            throw new Error("The parameter 'sorting' cannot be null.");
+        else if (sorting !== undefined)
+            url_ += "Sorting=" + encodeURIComponent("" + sorting) + "&";
+        if (pageNumber === null)
+            throw new Error("The parameter 'pageNumber' cannot be null.");
+        else if (pageNumber !== undefined)
+            url_ += "PageNumber=" + encodeURIComponent("" + pageNumber) + "&";
+        if (pageSize === null)
+            throw new Error("The parameter 'pageSize' cannot be null.");
+        else if (pageSize !== undefined)
+            url_ += "PageSize=" + encodeURIComponent("" + pageSize) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_: RequestInit = {
+            method: "GET",
+            headers: {
+                "Accept": "text/plain"
+            }
+        };
+
+        return this.http.fetch(url_, options_).then((_response: Response) => {
+            return this.processGetPostShareList(_response);
+        });
+    }
+
+    protected processGetPostShareList(response: Response): Promise<PostShareDtoPagedResultDto> {
+        const status = response.status;
+        let _headers: any = {}; if (response.headers && response.headers.forEach) { response.headers.forEach((v: any, k: any) => _headers[k] = v); };
+        if (status === 200) {
+            return response.text().then((_responseText) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = PostShareDtoPagedResultDto.fromJS(resultData200);
+            return result200;
+            });
+        } else if (status !== 200 && status !== 204) {
+            return response.text().then((_responseText) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            });
+        }
+        return Promise.resolve<PostShareDtoPagedResultDto>(null as any);
+    }
+
+    /**
+     * @param body (optional) 
+     * @return Success
+     */
+    createPostShare(body: CreatePostShareInput | undefined): Promise<void> {
+        let url_ = this.baseUrl + "/api/ChatApplication/CreatePostShare";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(body);
+
+        let options_: RequestInit = {
+            body: content_,
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            }
+        };
+
+        return this.http.fetch(url_, options_).then((_response: Response) => {
+            return this.processCreatePostShare(_response);
+        });
+    }
+
+    protected processCreatePostShare(response: Response): Promise<void> {
+        const status = response.status;
+        let _headers: any = {}; if (response.headers && response.headers.forEach) { response.headers.forEach((v: any, k: any) => _headers[k] = v); };
+        if (status === 200) {
+            return response.text().then((_responseText) => {
+            return;
+            });
+        } else if (status !== 200 && status !== 204) {
+            return response.text().then((_responseText) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            });
+        }
+        return Promise.resolve<void>(null as any);
+    }
+
+    /**
+     * @param id (optional) 
+     * @return Success
+     */
+    deleteChatDialog(id: string | undefined): Promise<void> {
+        let url_ = this.baseUrl + "/api/ChatApplication/DeleteChatDialog?";
+        if (id === null)
+            throw new Error("The parameter 'id' cannot be null.");
+        else if (id !== undefined)
+            url_ += "id=" + encodeURIComponent("" + id) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_: RequestInit = {
+            method: "DELETE",
+            headers: {
+            }
+        };
+
+        return this.http.fetch(url_, options_).then((_response: Response) => {
+            return this.processDeleteChatDialog(_response);
+        });
+    }
+
+    protected processDeleteChatDialog(response: Response): Promise<void> {
+        const status = response.status;
+        let _headers: any = {}; if (response.headers && response.headers.forEach) { response.headers.forEach((v: any, k: any) => _headers[k] = v); };
+        if (status === 200) {
+            return response.text().then((_responseText) => {
+            return;
+            });
+        } else if (status !== 200 && status !== 204) {
+            return response.text().then((_responseText) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            });
+        }
+        return Promise.resolve<void>(null as any);
+    }
+
+    /**
+     * @param chatDialogId (optional) 
+     * @param filter (optional) 
+     * @param sorting (optional) 
+     * @param pageNumber (optional) 
+     * @param pageSize (optional) 
+     * @return Success
+     */
+    getChatDialogHistory(chatDialogId: string | undefined, filter: string | undefined, sorting: string | undefined, pageNumber: number | undefined, pageSize: number | undefined): Promise<CreateChatDialogHistoryInputDtoPagedResultDto> {
+        let url_ = this.baseUrl + "/api/ChatApplication/GetChatDialogHistory?";
+        if (chatDialogId === null)
+            throw new Error("The parameter 'chatDialogId' cannot be null.");
+        else if (chatDialogId !== undefined)
+            url_ += "ChatDialogId=" + encodeURIComponent("" + chatDialogId) + "&";
+        if (filter === null)
+            throw new Error("The parameter 'filter' cannot be null.");
+        else if (filter !== undefined)
+            url_ += "Filter=" + encodeURIComponent("" + filter) + "&";
+        if (sorting === null)
+            throw new Error("The parameter 'sorting' cannot be null.");
+        else if (sorting !== undefined)
+            url_ += "Sorting=" + encodeURIComponent("" + sorting) + "&";
+        if (pageNumber === null)
+            throw new Error("The parameter 'pageNumber' cannot be null.");
+        else if (pageNumber !== undefined)
+            url_ += "PageNumber=" + encodeURIComponent("" + pageNumber) + "&";
+        if (pageSize === null)
+            throw new Error("The parameter 'pageSize' cannot be null.");
+        else if (pageSize !== undefined)
+            url_ += "PageSize=" + encodeURIComponent("" + pageSize) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_: RequestInit = {
+            method: "GET",
+            headers: {
+                "Accept": "text/plain"
+            }
+        };
+
+        return this.http.fetch(url_, options_).then((_response: Response) => {
+            return this.processGetChatDialogHistory(_response);
+        });
+    }
+
+    protected processGetChatDialogHistory(response: Response): Promise<CreateChatDialogHistoryInputDtoPagedResultDto> {
+        const status = response.status;
+        let _headers: any = {}; if (response.headers && response.headers.forEach) { response.headers.forEach((v: any, k: any) => _headers[k] = v); };
+        if (status === 200) {
+            return response.text().then((_responseText) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = CreateChatDialogHistoryInputDtoPagedResultDto.fromJS(resultData200);
+            return result200;
+            });
+        } else if (status !== 200 && status !== 204) {
+            return response.text().then((_responseText) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            });
+        }
+        return Promise.resolve<CreateChatDialogHistoryInputDtoPagedResultDto>(null as any);
+    }
 }
 
 export class FunctionService {
@@ -1978,6 +2178,62 @@ export interface ICreateChatDialogHistoryInputDto {
     type?: ChatDialogHistoryType;
 }
 
+export class CreateChatDialogHistoryInputDtoPagedResultDto implements ICreateChatDialogHistoryInputDtoPagedResultDto {
+    items?: CreateChatDialogHistoryInputDto[] | undefined;
+    totalCount?: number;
+    pageSize?: number;
+    pageNumber?: number;
+
+    constructor(data?: ICreateChatDialogHistoryInputDtoPagedResultDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            if (Array.isArray(_data["items"])) {
+                this.items = [] as any;
+                for (let item of _data["items"])
+                    this.items!.push(CreateChatDialogHistoryInputDto.fromJS(item));
+            }
+            this.totalCount = _data["totalCount"];
+            this.pageSize = _data["pageSize"];
+            this.pageNumber = _data["pageNumber"];
+        }
+    }
+
+    static fromJS(data: any): CreateChatDialogHistoryInputDtoPagedResultDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new CreateChatDialogHistoryInputDtoPagedResultDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        if (Array.isArray(this.items)) {
+            data["items"] = [];
+            for (let item of this.items)
+                data["items"].push(item.toJSON());
+        }
+        data["totalCount"] = this.totalCount;
+        data["pageSize"] = this.pageSize;
+        data["pageNumber"] = this.pageNumber;
+        return data;
+    }
+}
+
+export interface ICreateChatDialogHistoryInputDtoPagedResultDto {
+    items?: CreateChatDialogHistoryInputDto[] | undefined;
+    totalCount?: number;
+    pageSize?: number;
+    pageNumber?: number;
+}
+
 export class CreateChatDialogInputDto implements ICreateChatDialogInputDto {
     id?: string;
     name?: string | undefined;
@@ -2136,6 +2392,58 @@ export interface ICreateKnowledgeDetailsInput {
     overlappingTokens?: number;
     trainingPattern?: TrainingPatternType;
     qaPromptTemplate?: string | undefined;
+}
+
+export class CreatePostShareInput implements ICreatePostShareInput {
+    name?: string | undefined;
+    chatApplicationId?: string | undefined;
+    expires?: Date;
+    availableToken?: number;
+    availableQuantity?: number;
+
+    constructor(data?: ICreatePostShareInput) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.name = _data["name"];
+            this.chatApplicationId = _data["chatApplicationId"];
+            this.expires = _data["expires"] ? new Date(_data["expires"].toString()) : <any>undefined;
+            this.availableToken = _data["availableToken"];
+            this.availableQuantity = _data["availableQuantity"];
+        }
+    }
+
+    static fromJS(data: any): CreatePostShareInput {
+        data = typeof data === 'object' ? data : {};
+        let result = new CreatePostShareInput();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["name"] = this.name;
+        data["chatApplicationId"] = this.chatApplicationId;
+        data["expires"] = this.expires ? this.expires.toISOString() : <any>undefined;
+        data["availableToken"] = this.availableToken;
+        data["availableQuantity"] = this.availableQuantity;
+        return data;
+    }
+}
+
+export interface ICreatePostShareInput {
+    name?: string | undefined;
+    chatApplicationId?: string | undefined;
+    expires?: Date;
+    availableToken?: number;
+    availableQuantity?: number;
 }
 
 export class CreateUserInput implements ICreateUserInput {
@@ -3039,6 +3347,126 @@ export class KnowledgeBasesDtoPagedResultDto implements IKnowledgeBasesDtoPagedR
 
 export interface IKnowledgeBasesDtoPagedResultDto {
     items?: KnowledgeBasesDto[] | undefined;
+    totalCount?: number;
+    pageSize?: number;
+    pageNumber?: number;
+}
+
+export class PostShareDto implements IPostShareDto {
+    id?: string | undefined;
+    name?: string | undefined;
+    chatApplicationId?: string | undefined;
+    expires?: Date | undefined;
+    usedToken?: number;
+    availableToken?: number;
+    availableQuantity?: number;
+    apiKey?: string | undefined;
+
+    constructor(data?: IPostShareDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.id = _data["id"];
+            this.name = _data["name"];
+            this.chatApplicationId = _data["chatApplicationId"];
+            this.expires = _data["expires"] ? new Date(_data["expires"].toString()) : <any>undefined;
+            this.usedToken = _data["usedToken"];
+            this.availableToken = _data["availableToken"];
+            this.availableQuantity = _data["availableQuantity"];
+            this.apiKey = _data["apiKey"];
+        }
+    }
+
+    static fromJS(data: any): PostShareDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new PostShareDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
+        data["name"] = this.name;
+        data["chatApplicationId"] = this.chatApplicationId;
+        data["expires"] = this.expires ? this.expires.toISOString() : <any>undefined;
+        data["usedToken"] = this.usedToken;
+        data["availableToken"] = this.availableToken;
+        data["availableQuantity"] = this.availableQuantity;
+        data["apiKey"] = this.apiKey;
+        return data;
+    }
+}
+
+export interface IPostShareDto {
+    id?: string | undefined;
+    name?: string | undefined;
+    chatApplicationId?: string | undefined;
+    expires?: Date | undefined;
+    usedToken?: number;
+    availableToken?: number;
+    availableQuantity?: number;
+    apiKey?: string | undefined;
+}
+
+export class PostShareDtoPagedResultDto implements IPostShareDtoPagedResultDto {
+    items?: PostShareDto[] | undefined;
+    totalCount?: number;
+    pageSize?: number;
+    pageNumber?: number;
+
+    constructor(data?: IPostShareDtoPagedResultDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            if (Array.isArray(_data["items"])) {
+                this.items = [] as any;
+                for (let item of _data["items"])
+                    this.items!.push(PostShareDto.fromJS(item));
+            }
+            this.totalCount = _data["totalCount"];
+            this.pageSize = _data["pageSize"];
+            this.pageNumber = _data["pageNumber"];
+        }
+    }
+
+    static fromJS(data: any): PostShareDtoPagedResultDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new PostShareDtoPagedResultDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        if (Array.isArray(this.items)) {
+            data["items"] = [];
+            for (let item of this.items)
+                data["items"].push(item.toJSON());
+        }
+        data["totalCount"] = this.totalCount;
+        data["pageSize"] = this.pageSize;
+        data["pageNumber"] = this.pageNumber;
+        return data;
+    }
+}
+
+export interface IPostShareDtoPagedResultDto {
+    items?: PostShareDto[] | undefined;
     totalCount?: number;
     pageSize?: number;
     pageNumber?: number;

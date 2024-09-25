@@ -10,7 +10,7 @@ import { ChatApplicationDto, ChatApplicationService } from '../../../services/se
 
 
 const AppItemDetail = styled.div`
-    padding: 16px;
+    //padding: 16px;
 `;
 
 interface IAppListProps {
@@ -48,7 +48,7 @@ export function AppList(props: IAppListProps) {
                     height: '100%',
                     marginTop: 8,
                 }}>
-                    <AppItemDetail>
+                    <AppItemDetail style={{ opacity: 0.7}}>
                         对话模型：
                         {item.chatModel}
                     </AppItemDetail>

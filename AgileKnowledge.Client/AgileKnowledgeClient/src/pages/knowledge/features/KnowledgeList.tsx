@@ -39,7 +39,7 @@ export function AppList(props: IAppListProps) {
                 openWikiDetail(item.id!);
             }}>
                 <div style={{ fontSize: 15, fontWeight: 600 }}>{item.name}</div>
-                <div style={{ opacity: 0.6 }}>
+                <div style={{ opacity: 0.7,marginTop: 10}}>
                     QA模型：
                     {item.model}
                 </div>
