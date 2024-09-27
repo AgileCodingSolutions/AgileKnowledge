@@ -118,32 +118,44 @@ namespace AgileKnowledge.Service.Controllers
 		[HttpDelete]
 		public async Task DeleteDetailsAsync(Guid id)
 		{
-			var entity =	await _dbContext.KnowledgeBaseDetails.Where(x => x.Id == id).FirstOrDefaultAsync();
+			var entity =	await _dbContext.FileStorages.Where(x => x.Id == id).FirstOrDefaultAsync();
+			var query = await _dbContext.KnowledgeBaseDetails.Where(f => f.File.Id == id).FirstOrDefaultAsync();
 
 			_dbContext.Remove(entity);
-
+			_dbContext.Remove(query);
 			await	_dbContext.SaveChangesAsync();
 		}
 
 		[HttpGet]
-		public async Task<PagedResultDto<KnowledgeBaseDetailsDto>> GetDetailsListAsync([FromQuery] KnowledgeBaseDetailsInputDto input)
+		public async Task<PagedResultDto<KnowledgeBaseDetailsViewDto>> GetDetailsListAsync([FromQuery] KnowledgeBaseDetailsInputDto input)
 		{
-			var query = _dbContext.KnowledgeBases.Where(x => x.Id == input.KnowledgeBaseId)
-				.Include(x => x.KnowledgeBaseDetails)
-				.SelectMany(x => x.KnowledgeBaseDetails).WhereIf(input.State != null,x => x.State == input.State);
+				var query = _dbContext.KnowledgeBases.Where(x => x.Id == input.KnowledgeBaseId)
+					.Include(x => x.KnowledgeBaseDetails).ThenInclude(s => s.File)
+					.SelectMany(x => x.KnowledgeBaseDetails).WhereIf(input.State != null, x => x.State == input.State);
+				var files = query.Select(s => s.File).ToList();
+				var total = query.Count();
 
-			var total = query.Count();
+				var list = await query.PageBy(input.PageNumber, input.PageSize).ToListAsync();
+				var baseDto = _mapper.Map<List<KnowledgeBaseDetailsDto>>(list);
+				var result = baseDto.Select(s => new KnowledgeBaseDetailsViewDto
+				{
+					Id = s.File.Id,
+					State = s.State,
+					Name = s.File.Name,
+					DataCount = s.DataCount,
+					KnowledgeBase = s.KnowledgeBase,
+					Type = s.File.Type,
+                    CreationTime = s.File.CreationTime,
+				}).ToList();
 
-			var list = await query.PageBy(input.PageNumber, input.PageSize).ToListAsync();
-
-			return new PagedResultDto<KnowledgeBaseDetailsDto>(total, _mapper.Map<List<KnowledgeBaseDetailsDto>>(list));
+				return new PagedResultDto<KnowledgeBaseDetailsViewDto>(total, result);
 		}
 
 
 
 
 
-		[HttpGet]
+			[HttpGet]
 		public async Task<PagedResultDto<KnowledgeBaseDetailVectorQuantityDto>> GetDetailVectorQuantityAsync(KnowledgeBaseDetailsVectorQuantityInputDto input)
 		{
 
@@ -300,6 +312,7 @@ namespace AgileKnowledge.Service.Controllers
 		}
 
 
+        
 
-	}
+    }
 }

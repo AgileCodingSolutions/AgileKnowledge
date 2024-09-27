@@ -15,8 +15,8 @@ var knowledgeService = new KnowledgeService();
     const columns = [
         {
             title: '文件名',
-            dataIndex: 'fileName',
-            key: 'fileName',
+            dataIndex: 'name',
+            key: 'name',
             render: (text: string, item: any) => {
                 return item.isedit ? <input
                     autoFocus
@@ -53,7 +53,7 @@ var knowledgeService = new KnowledgeService();
         {
             title: '数据类型',
             dataIndex: 'type',
-            key: 'type',
+            key: 'dataType',
         },
         {
             title: '数据状态',
@@ -64,6 +64,12 @@ var knowledgeService = new KnowledgeService();
             title: '创建时间',
             key: 'creationTime',
             dataIndex: 'creationTime',
+            render: (text: string) => {
+                if (!text) return '-';
+                
+                const date = new Date(text);
+                return date.toLocaleString(); 
+              },
         },
         {
             title: '操作',
@@ -122,15 +128,14 @@ var knowledgeService = new KnowledgeService();
             },
         },
     ]
-
-    const [data, setData] = useState([] as any[]);
+    const [data, setData] = useState([] as any);
     const [visible, setVisible] = useState(false);
     const [openItem, setOpenItem] = useState({} as any);
     const [total, setTotal] = useState(0);
     const [input, setInput] = useState({
         keyword: '',
         page: 1,
-        pageSize: 10,
+        pageSize: 5,
         filter : '',
         state: undefined as KnowledgeBaseQuantizationState | undefined
     });
@@ -173,10 +178,11 @@ var knowledgeService = new KnowledgeService();
         // 修改更新
         setData([...data]);
     }
-
     async function RemoveDeleteWikiDetails(id: string) {
         try {
-            //await DeleteWikiDetails(id);
+            await  knowledgeService.deleteDetails(id);
+
+            console.log(id,222222222)
             message.success('删除成功');
             setInput({
                 ...input,
@@ -212,16 +218,12 @@ var knowledgeService = new KnowledgeService();
     async function loadingData() {
         try {
             const result = await knowledgeService.getDetailsList(id, input.state, input.filter ,input.keyword, input.page, input.pageSize);
-            console.log(result);
-            // const updatedItems = result.items!.map((item: UserDto, index : number) => {
-            //     return {
-            //         ...item,
-            //         key: index + 1
-            //     };
-            // });
-            //debugger;
-            setData(result as any);
+
+            // const files = result.items ? result.items.map(item => item.file) : [];
+
+            setData(result.items!);
             setTotal(result.totalCount!);
+            //console.log(result.totalCount!,33333)
         } catch (error) {
                  
         }
@@ -278,6 +280,7 @@ var knowledgeService = new KnowledgeService();
                 padding: 16,
                 borderRadius: 8,
             }} />
+            
         {/* <WikiDetailFile onClose={() => {
             setVisible(false);
         }} wikiDetail={openItem} visible={visible} /> */}

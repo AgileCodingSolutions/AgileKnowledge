@@ -4,8 +4,10 @@ namespace AgileKnowledge.Service.Mappings.KnowledgeBases
 {
     public sealed class KnowledgDetailDto
     {
-        public string WikiId { get; set; }
+        public Guid Id { get; set; }
 
+        
+        public Guid KnowledgeBaseld { get; set; }
 
         public string FileName { get; set; }
 
@@ -13,18 +15,13 @@ namespace AgileKnowledge.Service.Mappings.KnowledgeBases
 
         public int DataCount { get; set; }
 
-
+        
         public string Type { get; set; }
 
         public long Creator { get; }
 
         public DateTime CreationTime { get; set; }
-
         public WikiQuantizationState State { get; set; }
-
-        public long Modifier { get; set; }
-
-        public DateTime ModificationTime { get; set; }
 
         public string StateName
         {
@@ -44,6 +41,10 @@ namespace AgileKnowledge.Service.Mappings.KnowledgeBases
             }
         }
 
-       
+        public long Modifier { get; set; }
+
+        public DateTime ModificationTime { get; set; }
     }
+
+
 }

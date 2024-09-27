@@ -1,6 +1,5 @@
-
 import { UploadFile } from "../../../services/StorageService";
-import { Button, Steps, Upload, UploadProps, Table, Progress, Radio, Input, message, MenuProps, Dropdown } from 'antd';
+import { Button, Steps, Upload, UploadProps, Table, Progress, Radio, message, MenuProps, Dropdown } from 'antd';
 import { useState } from 'react';
 import { InboxOutlined, CloseOutlined } from '@ant-design/icons';
 import styled from 'styled-components';
@@ -8,10 +7,8 @@ import { bytesToSize } from '../../../utils/stringHelper';
 import { CreateKnowledgeDetailsInput, TrainingPatternType } from '../../../services/service-proxies';
 import { KnowledgeService } from '../../../services/service-proxies';
 import { TextArea } from '@lobehub/ui';
-//import { json } from "react-router-dom";
 
-
-const FileItem = styled.div`/
+const FileItem = styled.div`
     transition: border-color 0.3s linear;
     border: 1px solid #d9d9d9;
     border-radius: 8px;
@@ -36,12 +33,11 @@ interface IUploadWikiFileProps {
 
 export default function UploadWikiFile({ id, onChagePath }: IUploadWikiFileProps) {
     const [current, setCurrent] = useState(0);
-    // const [uploading, setUploading] = useState(false);
     const [fileList, setFileList] = useState<any[]>([]);
     const [trainingPattern, setTrainingPattern] = useState(TrainingPatternType._1);
-    const [maxTokensPerParagraph, setMaxTokensPerParagraph] = useState(1000); // 每个段落标记的最大数量。当对文档进行分区时，每个分区通常包含一个段落。
-    const [maxTokensPerLine, setMaxTokensPerLine] = useState(300); // 每行，也就是每个句子的最大标记数。当分割一个文本块时，文本将被分割成句子，然后被分组成段落。注意，这适用于任何文本格式，包括表格、代码、聊天记录、日志文件等。
-    const [overlappingTokens, setOverlappingTokens] = useState(100); // 重叠标记数。当对文档进行分区时，每个分区的开始和结束部分将重叠。这有助于确保模型在分区之间保持上下文一致性。
+    const [maxTokensPerParagraph, setMaxTokensPerParagraph] = useState(1000);
+    const [maxTokensPerLine, setMaxTokensPerLine] = useState(300);
+    const [overlappingTokens, setOverlappingTokens] = useState(100);
     const [qAPromptTemplate, setQAPromptTemplate] = useState(`
     我会给你一段文本，学习它们，并整理学习成果，要求为：
     1. 提出最多 20 个问题。
@@ -69,7 +65,6 @@ export default function UploadWikiFile({ id, onChagePath }: IUploadWikiFileProps
             return false;
         }
     };
-
     const columns = [
         {
             title: '文件名',
@@ -122,7 +117,7 @@ export default function UploadWikiFile({ id, onChagePath }: IUploadWikiFileProps
         });
         message.success('上传成功');
     }
-
+    
     async function Upload(file: any) {
 
         const fileItem = await UploadFile(file);
@@ -130,7 +125,6 @@ export default function UploadWikiFile({ id, onChagePath }: IUploadWikiFileProps
 
         setFileList([...fileList]);
 
-    
         await knowledgeService.createDetails(new CreateKnowledgeDetailsInput({
             fileId: fileItem.id,
             filePath: fileItem.path,
@@ -198,7 +192,6 @@ export default function UploadWikiFile({ id, onChagePath }: IUploadWikiFileProps
                     height: '200px',
                     alignContent: 'flex-start'
                 }}>
-
                     {fileList.length > 0 && fileList.map((item, index) => {
                         return <FileItem>
                             <span>{item.name}</span>
@@ -219,7 +212,6 @@ export default function UploadWikiFile({ id, onChagePath }: IUploadWikiFileProps
                     })}
                 </div>
                 <Button onClick={() => {
-
                     setCurrent(1);
                 }} style={{
                     float: 'right',
@@ -230,59 +222,74 @@ export default function UploadWikiFile({ id, onChagePath }: IUploadWikiFileProps
         {
             current === 1 && <>
                 <div style={{
-                    height: 140,
+                    display: 'flex',
+                    flexDirection: 'column',
+                    height: '55%'
                 }}>
-                    <Radio.Group style={{
+                    <div style={{
+                        flex: '1',
                         marginBottom: 20
-                    }} onChange={(v: any) => {
-                        const value = Number(v.target.value);
-                        setTrainingPattern(value as TrainingPatternType);
-                    }} value={trainingPattern}>
-                        <Radio style={{
-                            border: '1px solid #d9d9d9',
-                            borderRadius: 8,
-                            padding: 10,
-                            marginRight: 10
-                        }} value={TrainingPatternType._0}>文本拆分</Radio>
-                        <Radio style={{
-                            border: '1px solid #d9d9d9',
-                            borderRadius: 8,
-                            padding: 10,
-                            marginRight: 10
-                        }} value={TrainingPatternType._1}>QA问答拆分</Radio>
-                    </Radio.Group>
-                    
-                    {
-                        trainingPattern === TrainingPatternType._1 && <>
-                            <span>QA问答模板：</span>
-                            <TextArea value={qAPromptTemplate} onChange={(v) => {
-                                setQAPromptTemplate(v.target.value);
-                            }}>
-                            </TextArea>
-                        </>
-                    }
-                </div>
-                <Table dataSource={fileList.map(item => {
-                    return {
-                        fileName: item.name,
-                        progress: item.progress || 0,
-                        dataProgress: item.dataProgress || 0
-                    }
-                })} columns={columns} />
-                <Button type='primary' onClick={() => {
-                    saveFile();
-                }} style={{
-                    float: 'right',
-                    marginTop: 20,
-                    marginLeft: 20,
-                }}>提交数据（{fileList.length}）</Button>
-                <Button onClick={() => {
-                    setCurrent(0);
-                }} style={{
-                    float: 'right',
-                    marginTop: 20,
-                }}>上一步</Button>
-            </>
-        }
-    </>)
-}
+                    }}>
+                        <Radio.Group style={{
+                            marginBottom: 20
+                        }} onChange={(v: any) => {
+                            const value = Number(v.target.value);
+                            setTrainingPattern(value as TrainingPatternType);
+                        }} value={trainingPattern}>
+                            <Radio style={{
+                                border: '1px solid #d9d9d9',
+                                borderRadius: 8,
+                                padding: 10,
+                                marginRight: 10
+                            }} value={TrainingPatternType._0}>文本拆分</Radio>
+                            <Radio style={{
+                                border: '1px solid #d9d9d9',
+                                borderRadius: 8,
+                                padding: 10,
+                                marginRight: 10
+                            }} value={TrainingPatternType._1}>QA问答拆分</Radio>
+                        </Radio.Group>
+                        
+                        {
+                            trainingPattern === TrainingPatternType._1 && <>
+                                <span>QA问答模板：</span>
+                                <TextArea rows={4} value={qAPromptTemplate} onChange={(v) => {
+                                    setQAPromptTemplate(v.target.value);
+                                }} style={{
+                                    minHeight: '50px',
+                                    flex: '1'
+                                }} />
+                            </>
+                        }
+                    </div>
+                    <div style={{
+                        flex: '1'
+                    }}>
+                        <Table dataSource={fileList.map(item => {
+                            return {
+                                fileName: item.name,
+                                progress: item.progress || 0,
+                                dataProgress: item.dataProgress || 0
+                            }
+                        })} columns={columns} />
+                        <Button type='primary' onClick={() => {
+                        saveFile();}} style={{
+                            float: 'right',
+                            marginTop: 20,
+                            marginLeft: 20,
+                        }}>提交数据（{fileList.length}）</Button>
+                        <Button onClick={() => {
+                            setCurrent(0);
+                        }} style={{
+                            float: 'right',
+                            marginTop: 20,
+                        }}>上一步</Button>
+                        </div>
+                        </div>
+                        
+                    </>
+                }
+            </>)
+            }
+            
+            

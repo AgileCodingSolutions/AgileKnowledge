@@ -972,7 +972,7 @@ export class KnowledgeService {
      * @param pageSize (optional) 
      * @return Success
      */
-    getDetailsList(knowledgeBaseId: string | undefined, state: KnowledgeBaseQuantizationState | undefined, filter: string | undefined, sorting: string | undefined, pageNumber: number | undefined, pageSize: number | undefined): Promise<KnowledgeBaseDetailsDtoPagedResultDto> {
+    getDetailsList(knowledgeBaseId: string | undefined, state: KnowledgeBaseQuantizationState | undefined, filter: string | undefined, sorting: string | undefined, pageNumber: number | undefined, pageSize: number | undefined): Promise<KnowledgeBaseDetailsViewDtoPagedResultDto> {
         let url_ = this.baseUrl + "/api/Knowledge/GetDetailsList?";
         if (knowledgeBaseId === null)
             throw new Error("The parameter 'knowledgeBaseId' cannot be null.");
@@ -1012,14 +1012,14 @@ export class KnowledgeService {
         });
     }
 
-    protected processGetDetailsList(response: Response): Promise<KnowledgeBaseDetailsDtoPagedResultDto> {
+    protected processGetDetailsList(response: Response): Promise<KnowledgeBaseDetailsViewDtoPagedResultDto> {
         const status = response.status;
         let _headers: any = {}; if (response.headers && response.headers.forEach) { response.headers.forEach((v: any, k: any) => _headers[k] = v); };
         if (status === 200) {
             return response.text().then((_responseText) => {
             let result200: any = null;
             let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
-            result200 = KnowledgeBaseDetailsDtoPagedResultDto.fromJS(resultData200);
+            result200 = KnowledgeBaseDetailsViewDtoPagedResultDto.fromJS(resultData200);
             return result200;
             });
         } else if (status !== 200 && status !== 204) {
@@ -1027,7 +1027,7 @@ export class KnowledgeService {
             return throwException("An unexpected server error occurred.", status, _responseText, _headers);
             });
         }
-        return Promise.resolve<KnowledgeBaseDetailsDtoPagedResultDto>(null as any);
+        return Promise.resolve<KnowledgeBaseDetailsViewDtoPagedResultDto>(null as any);
     }
 
     /**
@@ -3054,138 +3054,6 @@ export interface IKnowledgeBaseDetails {
     knowledgeBase?: KnowledgeBase;
 }
 
-export class KnowledgeBaseDetailsDto implements IKnowledgeBaseDetailsDto {
-    state?: KnowledgeBaseQuantizationState;
-    maxTokensPerParagraph?: number;
-    maxTokensPerLine?: number;
-    overlappingTokens?: number;
-    trainingPattern?: TrainingPatternType;
-    qaPromptTemplate?: string | undefined;
-    dataCount?: number;
-    file?: FileStorage;
-    knowledgeBase?: KnowledgeBase;
-    lastModifierId?: string;
-    lastModificationTime?: Date | undefined;
-
-    constructor(data?: IKnowledgeBaseDetailsDto) {
-        if (data) {
-            for (var property in data) {
-                if (data.hasOwnProperty(property))
-                    (<any>this)[property] = (<any>data)[property];
-            }
-        }
-    }
-
-    init(_data?: any) {
-        if (_data) {
-            this.state = _data["state"];
-            this.maxTokensPerParagraph = _data["maxTokensPerParagraph"];
-            this.maxTokensPerLine = _data["maxTokensPerLine"];
-            this.overlappingTokens = _data["overlappingTokens"];
-            this.trainingPattern = _data["trainingPattern"];
-            this.qaPromptTemplate = _data["qaPromptTemplate"];
-            this.dataCount = _data["dataCount"];
-            this.file = _data["file"] ? FileStorage.fromJS(_data["file"]) : <any>undefined;
-            this.knowledgeBase = _data["knowledgeBase"] ? KnowledgeBase.fromJS(_data["knowledgeBase"]) : <any>undefined;
-            this.lastModifierId = _data["lastModifierId"];
-            this.lastModificationTime = _data["lastModificationTime"] ? new Date(_data["lastModificationTime"].toString()) : <any>undefined;
-        }
-    }
-
-    static fromJS(data: any): KnowledgeBaseDetailsDto {
-        data = typeof data === 'object' ? data : {};
-        let result = new KnowledgeBaseDetailsDto();
-        result.init(data);
-        return result;
-    }
-
-    toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {};
-        data["state"] = this.state;
-        data["maxTokensPerParagraph"] = this.maxTokensPerParagraph;
-        data["maxTokensPerLine"] = this.maxTokensPerLine;
-        data["overlappingTokens"] = this.overlappingTokens;
-        data["trainingPattern"] = this.trainingPattern;
-        data["qaPromptTemplate"] = this.qaPromptTemplate;
-        data["dataCount"] = this.dataCount;
-        data["file"] = this.file ? this.file.toJSON() : <any>undefined;
-        data["knowledgeBase"] = this.knowledgeBase ? this.knowledgeBase.toJSON() : <any>undefined;
-        data["lastModifierId"] = this.lastModifierId;
-        data["lastModificationTime"] = this.lastModificationTime ? this.lastModificationTime.toISOString() : <any>undefined;
-        return data;
-    }
-}
-
-export interface IKnowledgeBaseDetailsDto {
-    state?: KnowledgeBaseQuantizationState;
-    maxTokensPerParagraph?: number;
-    maxTokensPerLine?: number;
-    overlappingTokens?: number;
-    trainingPattern?: TrainingPatternType;
-    qaPromptTemplate?: string | undefined;
-    dataCount?: number;
-    file?: FileStorage;
-    knowledgeBase?: KnowledgeBase;
-    lastModifierId?: string;
-    lastModificationTime?: Date | undefined;
-}
-
-export class KnowledgeBaseDetailsDtoPagedResultDto implements IKnowledgeBaseDetailsDtoPagedResultDto {
-    items?: KnowledgeBaseDetailsDto[] | undefined;
-    totalCount?: number;
-    pageSize?: number;
-    pageNumber?: number;
-
-    constructor(data?: IKnowledgeBaseDetailsDtoPagedResultDto) {
-        if (data) {
-            for (var property in data) {
-                if (data.hasOwnProperty(property))
-                    (<any>this)[property] = (<any>data)[property];
-            }
-        }
-    }
-
-    init(_data?: any) {
-        if (_data) {
-            if (Array.isArray(_data["items"])) {
-                this.items = [] as any;
-                for (let item of _data["items"])
-                    this.items!.push(KnowledgeBaseDetailsDto.fromJS(item));
-            }
-            this.totalCount = _data["totalCount"];
-            this.pageSize = _data["pageSize"];
-            this.pageNumber = _data["pageNumber"];
-        }
-    }
-
-    static fromJS(data: any): KnowledgeBaseDetailsDtoPagedResultDto {
-        data = typeof data === 'object' ? data : {};
-        let result = new KnowledgeBaseDetailsDtoPagedResultDto();
-        result.init(data);
-        return result;
-    }
-
-    toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {};
-        if (Array.isArray(this.items)) {
-            data["items"] = [];
-            for (let item of this.items)
-                data["items"].push(item.toJSON());
-        }
-        data["totalCount"] = this.totalCount;
-        data["pageSize"] = this.pageSize;
-        data["pageNumber"] = this.pageNumber;
-        return data;
-    }
-}
-
-export interface IKnowledgeBaseDetailsDtoPagedResultDto {
-    items?: KnowledgeBaseDetailsDto[] | undefined;
-    totalCount?: number;
-    pageSize?: number;
-    pageNumber?: number;
-}
-
 export class KnowledgeBaseDetailsVectorQuantityInputDto implements IKnowledgeBaseDetailsVectorQuantityInputDto {
     filter?: string | undefined;
     sorting?: string | undefined;
@@ -3236,6 +3104,162 @@ export interface IKnowledgeBaseDetailsVectorQuantityInputDto {
     pageNumber?: number;
     pageSize?: number;
     knowledgeBaseDetailsId?: string;
+}
+
+export class KnowledgeBaseDetailsViewDto implements IKnowledgeBaseDetailsViewDto {
+    state?: KnowledgeBaseQuantizationState;
+    maxTokensPerParagraph?: number;
+    maxTokensPerLine?: number;
+    overlappingTokens?: number;
+    trainingPattern?: TrainingPatternType;
+    qaPromptTemplate?: string | undefined;
+    dataCount?: number;
+    name?: string | undefined;
+    type?: string | undefined;
+    id?: string;
+    readonly creator?: number;
+    creationTime?: Date;
+    state1?: WikiQuantizationState;
+    readonly stateName?: string | undefined;
+    knowledgeBase?: KnowledgeBase;
+    lastModifierId?: string;
+    lastModificationTime?: Date | undefined;
+
+    constructor(data?: IKnowledgeBaseDetailsViewDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.state = _data["state"];
+            this.maxTokensPerParagraph = _data["maxTokensPerParagraph"];
+            this.maxTokensPerLine = _data["maxTokensPerLine"];
+            this.overlappingTokens = _data["overlappingTokens"];
+            this.trainingPattern = _data["trainingPattern"];
+            this.qaPromptTemplate = _data["qaPromptTemplate"];
+            this.dataCount = _data["dataCount"];
+            this.name = _data["name"];
+            this.type = _data["type"];
+            this.id = _data["id"];
+            (<any>this).creator = _data["creator"];
+            this.creationTime = _data["creationTime"] ? new Date(_data["creationTime"].toString()) : <any>undefined;
+            this.state1 = _data["state1"];
+            (<any>this).stateName = _data["stateName"];
+            this.knowledgeBase = _data["knowledgeBase"] ? KnowledgeBase.fromJS(_data["knowledgeBase"]) : <any>undefined;
+            this.lastModifierId = _data["lastModifierId"];
+            this.lastModificationTime = _data["lastModificationTime"] ? new Date(_data["lastModificationTime"].toString()) : <any>undefined;
+        }
+    }
+
+    static fromJS(data: any): KnowledgeBaseDetailsViewDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new KnowledgeBaseDetailsViewDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["state"] = this.state;
+        data["maxTokensPerParagraph"] = this.maxTokensPerParagraph;
+        data["maxTokensPerLine"] = this.maxTokensPerLine;
+        data["overlappingTokens"] = this.overlappingTokens;
+        data["trainingPattern"] = this.trainingPattern;
+        data["qaPromptTemplate"] = this.qaPromptTemplate;
+        data["dataCount"] = this.dataCount;
+        data["name"] = this.name;
+        data["type"] = this.type;
+        data["id"] = this.id;
+        data["creator"] = this.creator;
+        data["creationTime"] = this.creationTime ? this.creationTime.toISOString() : <any>undefined;
+        data["state1"] = this.state1;
+        data["stateName"] = this.stateName;
+        data["knowledgeBase"] = this.knowledgeBase ? this.knowledgeBase.toJSON() : <any>undefined;
+        data["lastModifierId"] = this.lastModifierId;
+        data["lastModificationTime"] = this.lastModificationTime ? this.lastModificationTime.toISOString() : <any>undefined;
+        return data;
+    }
+}
+
+export interface IKnowledgeBaseDetailsViewDto {
+    state?: KnowledgeBaseQuantizationState;
+    maxTokensPerParagraph?: number;
+    maxTokensPerLine?: number;
+    overlappingTokens?: number;
+    trainingPattern?: TrainingPatternType;
+    qaPromptTemplate?: string | undefined;
+    dataCount?: number;
+    name?: string | undefined;
+    type?: string | undefined;
+    id?: string;
+    creator?: number;
+    creationTime?: Date;
+    state1?: WikiQuantizationState;
+    stateName?: string | undefined;
+    knowledgeBase?: KnowledgeBase;
+    lastModifierId?: string;
+    lastModificationTime?: Date | undefined;
+}
+
+export class KnowledgeBaseDetailsViewDtoPagedResultDto implements IKnowledgeBaseDetailsViewDtoPagedResultDto {
+    items?: KnowledgeBaseDetailsViewDto[] | undefined;
+    totalCount?: number;
+    pageSize?: number;
+    pageNumber?: number;
+
+    constructor(data?: IKnowledgeBaseDetailsViewDtoPagedResultDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            if (Array.isArray(_data["items"])) {
+                this.items = [] as any;
+                for (let item of _data["items"])
+                    this.items!.push(KnowledgeBaseDetailsViewDto.fromJS(item));
+            }
+            this.totalCount = _data["totalCount"];
+            this.pageSize = _data["pageSize"];
+            this.pageNumber = _data["pageNumber"];
+        }
+    }
+
+    static fromJS(data: any): KnowledgeBaseDetailsViewDtoPagedResultDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new KnowledgeBaseDetailsViewDtoPagedResultDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        if (Array.isArray(this.items)) {
+            data["items"] = [];
+            for (let item of this.items)
+                data["items"].push(item.toJSON());
+        }
+        data["totalCount"] = this.totalCount;
+        data["pageSize"] = this.pageSize;
+        data["pageNumber"] = this.pageNumber;
+        return data;
+    }
+}
+
+export interface IKnowledgeBaseDetailsViewDtoPagedResultDto {
+    items?: KnowledgeBaseDetailsViewDto[] | undefined;
+    totalCount?: number;
+    pageSize?: number;
+    pageNumber?: number;
 }
 
 export enum KnowledgeBaseQuantizationState {
@@ -3928,6 +3952,12 @@ export interface IUserDtoPagedResultDto {
     totalCount?: number;
     pageSize?: number;
     pageNumber?: number;
+}
+
+export enum WikiQuantizationState {
+    _0 = 0,
+    _1 = 1,
+    _2 = 2,
 }
 
 export interface FileParameter {
