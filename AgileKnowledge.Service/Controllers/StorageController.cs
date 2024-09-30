@@ -3,7 +3,7 @@ using AgileKnowledge.Service.Domain.Enities;
 using AgileKnowledge.Service.Helper;
 using AgileKnowledge.Service.Mappings.Storage;
 using AutoMapper;
-
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 

@@ -14,6 +14,7 @@ using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 using AgileKnowledge.Service.Domain.Enum;
+using Microsoft.AspNetCore.Authorization;
 
 namespace AgileKnowledge.Service.Controllers
 {

@@ -22,7 +22,6 @@ namespace AgileKnowledge.Service.Service
 			int overlappingTokens,
 			string? chatModel, string? embeddingModel)
 		{
-
 			if (string.IsNullOrEmpty(ConnectionStringsOptions.DefaultConnection))
 			{
 				var memory = new KernelMemoryBuilder()
@@ -38,16 +37,21 @@ namespace AgileKnowledge.Service.Service
 						MaxTokensPerParagraph = maxTokensPerParagraph,
 						OverlappingTokens = overlappingTokens,
 					})
-					.WithOpenAITextGeneration(new OpenAIConfig()
+					.WithAzureOpenAITextGeneration(new AzureOpenAIConfig
 					{
+						Deployment = OpenAIOption.ChatModel,
+						Endpoint = OpenAIOption.ChatEndpoint,
+						Auth = AzureOpenAIConfig.AuthTypes.APIKey,
 						APIKey = OpenAIOption.ChatToken,
-						TextModel = chatModel,
+						APIType = AzureOpenAIConfig.APITypes.ChatCompletion
 					})
-					.WithOpenAITextEmbeddingGeneration(new OpenAIConfig()
+					.WithAzureOpenAITextEmbeddingGeneration(new AzureOpenAIConfig
 					{
-						APIKey = string.IsNullOrEmpty(OpenAIOption.EmbeddingToken)
-							? OpenAIOption.ChatToken
-							: OpenAIOption.EmbeddingToken,
+						Deployment = OpenAIOption.EmbeddingModel,
+						Endpoint = OpenAIOption.EmbeddingEndpoint,
+						Auth = AzureOpenAIConfig.AuthTypes.APIKey,
+						APIType = AzureOpenAIConfig.APITypes.EmbeddingGeneration,
+						APIKey = OpenAIOption.EmbeddingToken
 					})
 					.AddSingleton(new KnowledgeMemoryService())
 					.Build<MemoryServerless>();
@@ -75,40 +79,22 @@ namespace AgileKnowledge.Service.Service
 						MaxTokensPerParagraph = maxTokensPerParagraph,
 						OverlappingTokens = overlappingTokens
 					})
-                    //.WithOpenAITextGeneration(new OpenAIConfig()
-                    //{
-                    //	APIKey = OpenAIOption.ChatToken,
-                    //	TextModel = chatModel
-                    //}, null, new HttpClient(HttpClientHandler))
-                    //.WithOpenAITextEmbeddingGeneration(new OpenAIConfig()
-                    //{
-                    //	APIKey = string.IsNullOrEmpty(OpenAIOption.EmbeddingToken)
-                    //		? OpenAIOption.ChatToken
-                    //		: OpenAIOption.EmbeddingToken,
-                    //	EmbeddingModel = embeddingModel,
-                    //}, null, false, new HttpClient(HttpClientHandler))
-                    .WithAzureOpenAITextEmbeddingGeneration(new AzureOpenAIConfig
-                    {
-                        Deployment = "text-embedding-3-large-1",
-                        Endpoint = "https://shinetech-openai.openai.azure.com/",
-                        Auth = AzureOpenAIConfig.AuthTypes.APIKey,
-                        APIType = AzureOpenAIConfig.APITypes.EmbeddingGeneration,
-                        APIKey = "7eca0250381048d0938e07c3ce0ec0d9"
-                    })
-					.WithAzureOpenAITextGeneration(new AzureOpenAIConfig
+					.WithOpenAITextGeneration(new OpenAIConfig()
 					{
-						Deployment = "gpt35-1",
-						Endpoint = "https://shinetech-openai.openai.azure.com/",
-						Auth = AzureOpenAIConfig.AuthTypes.APIKey,
-						APIKey = "7eca0250381048d0938e07c3ce0ec0d9",
-						APIType = AzureOpenAIConfig.APITypes.ChatCompletion
-					})
-                    .Build<MemoryServerless>();
+						APIKey = OpenAIOption.ChatToken,
+						TextModel = chatModel
+					}, null, new HttpClient(HttpClientHandler))
+					.WithOpenAITextEmbeddingGeneration(new OpenAIConfig()
+					{
+						APIKey = string.IsNullOrEmpty(OpenAIOption.EmbeddingToken)
+							? OpenAIOption.ChatToken
+							: OpenAIOption.EmbeddingToken,
+						EmbeddingModel = embeddingModel,
+					}, null, false, new HttpClient(HttpClientHandler))
+					.Build<MemoryServerless>();
 
 				return memory;
 			}
-
-
 		}
 
 
@@ -122,19 +108,22 @@ namespace AgileKnowledge.Service.Service
 						StorageType = FileSystemTypes.Disk,
 						Directory = "./data"
 					})
-					.WithOpenAITextGeneration(new OpenAIConfig()
+					.WithAzureOpenAITextGeneration(new AzureOpenAIConfig
 					{
+						Deployment = OpenAIOption.ChatModel,
+						Endpoint = OpenAIOption.ChatEndpoint,
+						Auth = AzureOpenAIConfig.AuthTypes.APIKey,
 						APIKey = OpenAIOption.ChatToken,
-						TextModel = model ?? OpenAIOption.ChatToken
-					}, null, new HttpClient(HttpClientHandler))
-					.WithOpenAITextEmbeddingGeneration(new OpenAIConfig()
+						APIType = AzureOpenAIConfig.APITypes.ChatCompletion
+					})
+					.WithAzureOpenAITextEmbeddingGeneration(new AzureOpenAIConfig
 					{
-						// 如果 EmbeddingToken 为空，则使用 ChatToken
-						APIKey = string.IsNullOrEmpty(OpenAIOption.EmbeddingToken)
-							? OpenAIOption.ChatToken
-							: OpenAIOption.EmbeddingToken,
-						EmbeddingModel = OpenAIOption.EmbeddingModel,
-					}, null, false, new HttpClient(HttpClientHandler))
+						Deployment = OpenAIOption.EmbeddingModel,
+						Endpoint = OpenAIOption.EmbeddingEndpoint,
+						Auth = AzureOpenAIConfig.AuthTypes.APIKey,
+						APIType = AzureOpenAIConfig.APITypes.EmbeddingGeneration,
+						APIKey = OpenAIOption.EmbeddingToken
+					})
 					.Build<MemoryServerless>();
 			}
 			else
@@ -145,25 +134,20 @@ namespace AgileKnowledge.Service.Service
 						ConnectionString = ConnectionStringsOptions.DefaultConnection,
 						TableNamePrefix = ConnectionStringsOptions.TableNamePrefix
 					})
-					// 配置文档解析向量模型
-					.WithAzureOpenAITextEmbeddingGeneration(new AzureOpenAIConfig
+					.WithOpenAITextGeneration(new OpenAIConfig()
 					{
-						Deployment = "text-embedding-3-large-1",
-						Endpoint = "https://shinetech-openai.openai.azure.com/",
-						Auth = AzureOpenAIConfig.AuthTypes.APIKey,
-						APIType = AzureOpenAIConfig.APITypes.EmbeddingGeneration,
-						APIKey = "7eca0250381048d0938e07c3ce0ec0d9"
-					})
-					// 配置文本生成模型
-					.WithAzureOpenAITextGeneration(new AzureOpenAIConfig
+						APIKey = OpenAIOption.ChatToken,
+						TextModel = model ?? string.Empty
+					}, null, new HttpClient(HttpClientHandler))
+					.WithOpenAITextEmbeddingGeneration(new OpenAIConfig()
 					{
-						Deployment = "gpt35-1",
-						Endpoint = "https://shinetech-openai.openai.azure.com/",
-						Auth = AzureOpenAIConfig.AuthTypes.APIKey,
-						APIKey = "7eca0250381048d0938e07c3ce0ec0d9",
-						APIType = AzureOpenAIConfig.APITypes.ChatCompletion
-					})
-                    .Build<MemoryServerless>();
+						// 如果 EmbeddingToken 为空，则使用 ChatToken
+						APIKey = string.IsNullOrEmpty(OpenAIOption.EmbeddingToken)
+							? OpenAIOption.ChatToken
+							: OpenAIOption.EmbeddingToken,
+						EmbeddingModel = OpenAIOption.EmbeddingModel,
+					}, null, false, new HttpClient(HttpClientHandler))
+					.Build<MemoryServerless>();
 			}
 		}
 

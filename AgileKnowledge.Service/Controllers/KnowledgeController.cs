@@ -18,6 +18,7 @@ using AgileKnowledge.Service.Service;
 using Microsoft.KernelMemory;
 using DocumentFormat.OpenXml.Office2010.ExcelAc;
 using DocumentFormat.OpenXml.Vml;
+using Microsoft.AspNetCore.Authorization;
 
 namespace AgileKnowledge.Service.Controllers
 {
@@ -113,6 +114,8 @@ namespace AgileKnowledge.Service.Controllers
 			_dbContext.KnowledgeBaseDetails.Add(entity);
 
 			await _dbContext.SaveChangesAsync();
+
+			await QuantizeBackgroundService.AddKnowledgeBaseDetailAsync(entity);
 		}
 
 		[HttpDelete]
@@ -225,8 +228,8 @@ namespace AgileKnowledge.Service.Controllers
 		{
 			var stopwatch = Stopwatch.StartNew();
 			var memoryServerless = _memoryService.CreateMemoryServerless();
-			var searchResult = await memoryServerless.SearchAsync(search, "wiki",
-				new MemoryFilter().ByTag("wikiId", wikiId.ToString()), minRelevance: minRelevance, limit: 5);
+			var searchResult = await memoryServerless.SearchAsync(search, "knowledge",
+				new MemoryFilter().ByTag("knowledgeId", wikiId.ToString()), minRelevance: minRelevance, limit: 5);
 
 			stopwatch.Stop();
 

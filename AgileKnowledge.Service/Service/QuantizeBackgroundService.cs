@@ -99,7 +99,7 @@ namespace AgileKnowledge.Service.Service
 
 			try
 			{
-				_logger.LogInformation($"开始量化：{knowledgeBaseDetails.File.FullName} {knowledgeBaseDetails.File.Path} {knowledgeBaseDetails.File.Id}");
+				_logger.LogInformation($"开始量化：{knowledgeBaseDetails.File.Name} {knowledgeBaseDetails.File.Path} {knowledgeBaseDetails.File.Id}");
 				var step = new List<string>();
 				if (knowledgeBaseDetails.TrainingPattern == TrainingPatternType.QA)
 				{
@@ -109,7 +109,7 @@ namespace AgileKnowledge.Service.Service
 					serverless.Orchestrator.AddHandler<GenerateEmbeddingsHandler>("generate_embeddings");
 					serverless.Orchestrator.AddHandler<SaveRecordsHandler>("save_memory_records");
 					step.Add("extract_text");
-					step.Add(stepName);
+					//step.Add(stepName);
 					step.Add("generate_embeddings");
 					step.Add("save_memory_records");
 				}
@@ -127,15 +127,15 @@ namespace AgileKnowledge.Service.Service
 						tags: new TagCollection()
 						{
 							{
-								"wikiId", knowledgeBaseDetails.KnowledgeBase.Id.ToString()
+								"knowledgeId", knowledgeBaseDetails.KnowledgeBase.Id.ToString()
 							},
 							{
 								"fileId", knowledgeBaseDetails.File.Id.ToString()
 							},
 							{
-								"wikiDetailId", knowledgeBaseDetails.Id.ToString()
+								"knowledgeDetailId", knowledgeBaseDetails.Id.ToString()
 							}
-						}, "wiki");
+						}, "knowledge");
 				}
 				else if (knowledgeBaseDetails.File.Type == "web")
 				{
@@ -144,12 +144,12 @@ namespace AgileKnowledge.Service.Service
 						tags: new TagCollection()
 						{
 							{
-								"wikiId", knowledgeBaseDetails.KnowledgeBase.Id.ToString()
+								"knowledgeId", knowledgeBaseDetails.KnowledgeBase.Id.ToString()
 							},
 							{
-								"wikiDetailId", knowledgeBaseDetails.Id.ToString()
+								"knowledgeDetailId", knowledgeBaseDetails.Id.ToString()
 							}
-						}, "wiki", steps: step.ToArray());
+						}, "knowledge", steps: step.ToArray());
 				}
 				else if (knowledgeBaseDetails.File.Type == "data")
 				{
@@ -158,12 +158,12 @@ namespace AgileKnowledge.Service.Service
 						tags: new TagCollection()
 						{
 							{
-								"wikiId", knowledgeBaseDetails.KnowledgeBase.Id.ToString()
+								"knowledgeId", knowledgeBaseDetails.KnowledgeBase.Id.ToString()
 							},
 							{
-								"wikiDetailId", knowledgeBaseDetails.Id.ToString()
+								"knowledgeDetailId", knowledgeBaseDetails.Id.ToString()
 							}
-						}, "wiki", steps: step.ToArray());
+						}, "knowledge", steps: step.ToArray());
 				}
 
 				knowledgeBaseDetails.State = KnowledgeBaseQuantizationState.Success;

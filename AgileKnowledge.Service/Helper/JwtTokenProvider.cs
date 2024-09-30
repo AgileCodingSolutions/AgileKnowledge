@@ -19,6 +19,16 @@ namespace AgileKnowledge.Service.Helper
 
 		public Guid GetUserId()
 		{
+			if (_httpContextAccessor == null)
+			{
+				return Guid.Empty;
+			}
+			if (_httpContextAccessor.HttpContext == null)
+			{
+				return Guid.Empty;
+			}
+
+
 			var userIdClaim = _httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier);
 			if (userIdClaim?.Value == null)
 			{
