@@ -1,4 +1,5 @@
 ﻿using System.Collections.Concurrent;
+using System.Reflection;
 using System.Threading.Channels;
 using AgileKnowledge.Service.Domain;
 using AgileKnowledge.Service.Domain.Enities;
@@ -38,8 +39,9 @@ namespace AgileKnowledge.Service.Service
 
 
 		protected override async Task ExecuteAsync(CancellationToken stoppingToken)
+
 		{
-			var QUANTIZE_MAX_TASK = Environment.GetEnvironmentVariable("QUANTIZE_MAX_TASK");
+			var QUANTIZE_MAX_TASK = "1";//Environment.GetEnvironmentVariable("QUANTIZE_MAX_TASK");
 			if (!string.IsNullOrEmpty(QUANTIZE_MAX_TASK))
 			{
 				int.TryParse(QUANTIZE_MAX_TASK, out _maxTask);
@@ -103,7 +105,7 @@ namespace AgileKnowledge.Service.Service
 				{
 					var stepName = knowledgeBaseDetails.Id.ToString();
 					serverless.Orchestrator.AddHandler<TextExtractionHandler>("extract_text");
-					serverless.Orchestrator.AddHandler<QAHandler>(stepName);
+				    //serverless.Orchestrator.AddHandler<QAHandler>(stepName);
 					serverless.Orchestrator.AddHandler<GenerateEmbeddingsHandler>("generate_embeddings");
 					serverless.Orchestrator.AddHandler<SaveRecordsHandler>("save_memory_records");
 					step.Add("extract_text");
@@ -116,8 +118,11 @@ namespace AgileKnowledge.Service.Service
 				if (knowledgeBaseDetails.File.Type == "file")
 				{
 					var fileInfoQuery = knowledgeBaseDetails.File;
+                    var currentDirectory = Directory.GetCurrentDirectory();
+					var path = Path.Combine(currentDirectory, "wwwroot", fileInfoQuery.Path);
 
-					result = await serverless.ImportDocumentAsync(fileInfoQuery.FullName,
+
+                    result = await serverless.ImportDocumentAsync(path,
 						knowledgeBaseDetails.Id.ToString(),
 						tags: new TagCollection()
 						{
@@ -130,7 +135,7 @@ namespace AgileKnowledge.Service.Service
 							{
 								"wikiDetailId", knowledgeBaseDetails.Id.ToString()
 							}
-						}, "wiki", steps: step.ToArray());
+						}, "wiki");
 				}
 				else if (knowledgeBaseDetails.File.Type == "web")
 				{
@@ -162,8 +167,8 @@ namespace AgileKnowledge.Service.Service
 				}
 
 				knowledgeBaseDetails.State = KnowledgeBaseQuantizationState.Success;
-				dbContext.Update(knowledgeBaseDetails);
-				await dbContext.SaveChangesAsync();
+				//dbContext.Update(knowledgeBaseDetails);
+				//await dbContext.SaveChangesAsync();
 				_logger.LogInformation($"量化成功：{knowledgeBaseDetails.File.FullName} {knowledgeBaseDetails.File.Path} {knowledgeBaseDetails.File.Id} {result}");
 
 			}

@@ -145,6 +145,7 @@ namespace AgileKnowledge.Service.Controllers
 					DataCount = s.DataCount,
 					KnowledgeBase = s.KnowledgeBase,
 					Type = s.File.Type,
+                    //State1 = s.StateName,
                     CreationTime = s.File.CreationTime,
 				}).ToList();
 
@@ -155,7 +156,7 @@ namespace AgileKnowledge.Service.Controllers
 
 
 
-			[HttpGet]
+	    [HttpGet]
 		public async Task<PagedResultDto<KnowledgeBaseDetailVectorQuantityDto>> GetDetailVectorQuantityAsync(KnowledgeBaseDetailsVectorQuantityInputDto input)
 		{
 

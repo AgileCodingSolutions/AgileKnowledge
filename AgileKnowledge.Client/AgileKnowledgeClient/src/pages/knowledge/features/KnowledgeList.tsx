@@ -90,7 +90,8 @@ export function AppList(props: IAppListProps) {
 
     return (<>
         <GridShowcase style={{ width: '100%' }}>
-            <LogoThree size={180} style={{ marginTop: -64 }} />
+            {/* <LogoThree size={180} style={{ marginTop: -64 }} /> */}
+            <img height="135" width="135" src="https://registry.npmmirror.com/@lobehub/assets-logo/1.2.0/files/assets/logo-3d.webp"></img>
             <div style={{ fontSize: 48, fontWeight: 600, marginTop: -16 }}>知识库列表</div>
         </GridShowcase>
         <SpotlightCard style={{

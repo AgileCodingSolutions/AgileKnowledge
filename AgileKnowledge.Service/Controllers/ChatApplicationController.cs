@@ -193,5 +193,17 @@ namespace AgileKnowledge.Service.Controllers
 			return new PagedResultDto<CreateChatDialogHistoryInputDto>(total, _mapper.Map<List<CreateChatDialogHistoryInputDto>>(list));
         }
 
+
+        [HttpDelete]
+        public async Task DeleteChatDialogHistoryAsync(Guid chatDialohId)
+        {
+            var entity = await _dbContext.ChatDialogHistorys.Where(x => x.ChatDialog.Id == chatDialohId).FirstOrDefaultAsync();
+
+            _dbContext.Remove(entity);
+
+            await _dbContext.SaveChangesAsync();
+        }
+
+
     }
 }

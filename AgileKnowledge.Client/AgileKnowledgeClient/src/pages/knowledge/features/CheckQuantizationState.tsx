@@ -269,17 +269,19 @@ var knowledgeService = new KnowledgeService();
                 ]}
             />
         </header>
-        <Table dataSource={data}
-            pagination={{
-                current: input.page,
-                pageSize: input.pageSize,
-                total: total,
-                onChange: handleTableChange,
-            }} scroll={{ y: 'calc(100vh - 240px)' }} columns={columns} style={{
-                overflow: 'auto',
-                padding: 16,
-                borderRadius: 8,
-            }} />
+        <Table
+        dataSource={data}
+        pagination={{
+          current: input.page,
+          pageSize: input.pageSize,
+          total: total,
+          onChange: handleTableChange,
+        }}
+        scroll={{ y: 'calc(100vh - 240px)' }}
+        columns={columns}
+        rowKey="id"  // 指定每行数据的唯一键字段
+        style={{ overflow: 'auto', padding: 16, borderRadius: 8 }}
+      />
             
         {/* <WikiDetailFile onClose={() => {
             setVisible(false);

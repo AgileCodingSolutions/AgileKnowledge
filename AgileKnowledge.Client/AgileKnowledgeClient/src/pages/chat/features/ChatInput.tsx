@@ -1,12 +1,13 @@
 import { useState } from "react";
 import { generateRandomString } from "../../../utils/stringHelper";
-//import { fetchRaw } from "../utils/fetch";
+//import { fetchRaw } from "../../../App";
 import { ActionIcon, ChatInputActionBar, ChatInputArea, ChatSendButton } from "@lobehub/ui";
 import { Flexbox } from 'react-layout-kit';
 import { Eraser, Languages } from 'lucide-react';
 import React from "react";
 import { message } from "antd";
-//import { GetChatDialogHistoryInfo, PurageMessageHistory } from "../services/ChatApplicationService";
+import { KnowledgeService } from "../../../services/service-proxies";
+import { ChatApplicationService ,CreateChatDialogHistoryInputDto} from '../../../services/service-proxies';
 
 interface IFastChatInputProps {
     dialog: any;
@@ -23,7 +24,8 @@ export default function FastChatInput({
     history,
     setHistory
 }: IFastChatInputProps) {
-
+    var chatApplicationService = new ChatApplicationService();
+    var knowledgeService = new KnowledgeService();
     const [value, setValue] = useState<string>();
     const [loading, setLoading] = useState(false);
     const ref = React.useRef(null);
@@ -64,6 +66,35 @@ export default function FastChatInput({
                 },
                 role: 'user',
             };
+
+            async function SearchVectorQuantity() {
+                try {
+                    if (value === '') return;
+                    const result = await knowledgeService.getSearchVectorQuantity(id, value, 0.4);
+                    if(result.init!)
+                    setValue(result)
+                   
+                    
+                } catch (error) {
+        
+                }
+            }
+            
+
+
+
+
+
+            // await chatApplicationService.createChatDialogHistory(
+            //     {
+            //         chatDialogId: dialog.id,
+            //         //content :,
+            //         type : dialog.type
+            //     } as CreateChatDialogHistoryInputDto
+//);
+             // 发送消息到后端
+           //await chatApplicationService.createChatDialogHistory(input);
+
 
             history.push(userChat)
 
@@ -113,7 +144,7 @@ export default function FastChatInput({
             } else {
                 url = '/v1/chat/completions?chatId=' + application.id + "&chatDialogId=" + dialog.id;
             }
-
+            console.log(application.id, 11111111,dialog.id)
             let stream = await fetchRaw(url, requestInput);
 
             for await (const chunk of stream) {
@@ -164,13 +195,13 @@ export default function FastChatInput({
 
 
             // 通过对话id获取源数据
-            const hisotryInfo = await GetChatDialogHistoryInfo(chat.id);
-            
-            chat.extra.referenceFile = hisotryInfo.referenceFile;
+        //     const hisotryInfo = await chatApplicationService.getChatDialogHistory(chat.id,'','',input.page,input.pageSize);
+        //     console.log(chat.id , 566655225)
+        //     chat.extra.referenceFile = hisotryInfo.referenceFile;
 
-            setHistory([...history, chat]);
-        } catch (error) {
-            console.error(error);
+        //     setHistory([...history, chat]);
+        // } catch (error) {
+        //     console.error(error);
         } finally {
             setLoading(false);
         }
@@ -192,14 +223,18 @@ export default function FastChatInput({
                 style={{
                     height: '100%',
                 }}
-                bottomAddons={<ChatSendButton loading={loading} onSend={() => sendChat()} />}
+                bottomAddons={<ChatSendButton loading={loading} onSend={() => sendChat()} 
+                
+                />}
+                
                 topAddons={
                     <ChatInputActionBar
                         leftAddons={
                             <>
                                 <ActionIcon icon={Languages} color={undefined} fill={undefined} fillOpacity={undefined} fillRule={undefined} focusable={undefined} />
                                 <ActionIcon onClick={() => {
-                                    PurageMessageHistory(dialog.id)
+                                    chatApplicationService.deleteChatDialogHistory(dialog.id)
+
                                         .then(()=>{
                                             setHistory([]);
                                             message.success('清空成功');

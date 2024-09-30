@@ -166,8 +166,9 @@ const AppDetailInfo = memo(({ value }: IAppDetailInfoProps) => {
                     marginBottom: 20
                 }}
                 placeholder="绑定知识库"
-                defaultValue={application.knowledgeIds}
                 value={application.knowledgeIds}
+                defaultValue={application.knowledgeIds}
+                
                 onChange={(v: any) => {
                     setApplication({
                         ...application,

@@ -75,19 +75,35 @@ namespace AgileKnowledge.Service.Service
 						MaxTokensPerParagraph = maxTokensPerParagraph,
 						OverlappingTokens = overlappingTokens
 					})
-					.WithOpenAITextGeneration(new OpenAIConfig()
+                    //.WithOpenAITextGeneration(new OpenAIConfig()
+                    //{
+                    //	APIKey = OpenAIOption.ChatToken,
+                    //	TextModel = chatModel
+                    //}, null, new HttpClient(HttpClientHandler))
+                    //.WithOpenAITextEmbeddingGeneration(new OpenAIConfig()
+                    //{
+                    //	APIKey = string.IsNullOrEmpty(OpenAIOption.EmbeddingToken)
+                    //		? OpenAIOption.ChatToken
+                    //		: OpenAIOption.EmbeddingToken,
+                    //	EmbeddingModel = embeddingModel,
+                    //}, null, false, new HttpClient(HttpClientHandler))
+                    .WithAzureOpenAITextEmbeddingGeneration(new AzureOpenAIConfig
+                    {
+                        Deployment = "text-embedding-3-large-1",
+                        Endpoint = "https://shinetech-openai.openai.azure.com/",
+                        Auth = AzureOpenAIConfig.AuthTypes.APIKey,
+                        APIType = AzureOpenAIConfig.APITypes.EmbeddingGeneration,
+                        APIKey = "7eca0250381048d0938e07c3ce0ec0d9"
+                    })
+					.WithAzureOpenAITextGeneration(new AzureOpenAIConfig
 					{
-						APIKey = OpenAIOption.ChatToken,
-						TextModel = chatModel
-					}, null, new HttpClient(HttpClientHandler))
-					.WithOpenAITextEmbeddingGeneration(new OpenAIConfig()
-					{
-						APIKey = string.IsNullOrEmpty(OpenAIOption.EmbeddingToken)
-							? OpenAIOption.ChatToken
-							: OpenAIOption.EmbeddingToken,
-						EmbeddingModel = embeddingModel,
-					}, null, false, new HttpClient(HttpClientHandler))
-					.Build<MemoryServerless>();
+						Deployment = "gpt35-1",
+						Endpoint = "https://shinetech-openai.openai.azure.com/",
+						Auth = AzureOpenAIConfig.AuthTypes.APIKey,
+						APIKey = "7eca0250381048d0938e07c3ce0ec0d9",
+						APIType = AzureOpenAIConfig.APITypes.ChatCompletion
+					})
+                    .Build<MemoryServerless>();
 
 				return memory;
 			}
@@ -129,20 +145,25 @@ namespace AgileKnowledge.Service.Service
 						ConnectionString = ConnectionStringsOptions.DefaultConnection,
 						TableNamePrefix = ConnectionStringsOptions.TableNamePrefix
 					})
-					.WithOpenAITextGeneration(new OpenAIConfig()
+					// 配置文档解析向量模型
+					.WithAzureOpenAITextEmbeddingGeneration(new AzureOpenAIConfig
 					{
-						APIKey = OpenAIOption.ChatToken,
-						TextModel = model ?? string.Empty
-					}, null, new HttpClient(HttpClientHandler))
-					.WithOpenAITextEmbeddingGeneration(new OpenAIConfig()
+						Deployment = "text-embedding-3-large-1",
+						Endpoint = "https://shinetech-openai.openai.azure.com/",
+						Auth = AzureOpenAIConfig.AuthTypes.APIKey,
+						APIType = AzureOpenAIConfig.APITypes.EmbeddingGeneration,
+						APIKey = "7eca0250381048d0938e07c3ce0ec0d9"
+					})
+					// 配置文本生成模型
+					.WithAzureOpenAITextGeneration(new AzureOpenAIConfig
 					{
-						// 如果 EmbeddingToken 为空，则使用 ChatToken
-						APIKey = string.IsNullOrEmpty(OpenAIOption.EmbeddingToken)
-							? OpenAIOption.ChatToken
-							: OpenAIOption.EmbeddingToken,
-						EmbeddingModel = OpenAIOption.EmbeddingModel,
-					}, null, false, new HttpClient(HttpClientHandler))
-					.Build<MemoryServerless>();
+						Deployment = "gpt35-1",
+						Endpoint = "https://shinetech-openai.openai.azure.com/",
+						Auth = AzureOpenAIConfig.AuthTypes.APIKey,
+						APIKey = "7eca0250381048d0938e07c3ce0ec0d9",
+						APIType = AzureOpenAIConfig.APITypes.ChatCompletion
+					})
+                    .Build<MemoryServerless>();
 			}
 		}
 

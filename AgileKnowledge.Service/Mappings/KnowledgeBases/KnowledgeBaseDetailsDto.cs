@@ -41,13 +41,13 @@ namespace AgileKnowledge.Service.Mappings.KnowledgeBases
         {
             get
             {
-                switch (State1)
+                switch (State)
                 {
-                    case WikiQuantizationState.None:
+                    case KnowledgeBaseQuantizationState.None:
                         return "处理中";
-                    case WikiQuantizationState.Accomplish:
+                    case KnowledgeBaseQuantizationState.Success:
                         return "已完成";
-                    case WikiQuantizationState.Fail:
+                    case KnowledgeBaseQuantizationState.Failed:
                         return "失败";
                 }
 

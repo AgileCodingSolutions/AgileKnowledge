@@ -28,12 +28,6 @@ const DesktopLayout = memo(() => {
     description: '知识库',
     path: '/knowledge',
     role: 'admin, user'
-  },{
-    icon: SquareFunction,
-    key: 'function-call',
-    description: '函数管理',
-    path: '/function-call',
-    role: 'admin,user'
   }, {
     icon: User,
     key: 'user',

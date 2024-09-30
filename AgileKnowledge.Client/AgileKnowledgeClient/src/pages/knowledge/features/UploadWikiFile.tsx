@@ -112,10 +112,15 @@ export default function UploadWikiFile({ id, onChagePath }: IUploadWikiFileProps
     ];
 
     function saveFile() {
-        fileList.forEach(async (file) => {
-            await Upload(file)
-        });
-        message.success('上传成功');
+        
+        try {
+            fileList.forEach(async (file) => {
+                await Upload(file)
+            });
+            message.success('上传成功');
+          } catch (error) {
+            message.error('上传失败');
+          }
     }
     
     async function Upload(file: any) {
@@ -193,7 +198,7 @@ export default function UploadWikiFile({ id, onChagePath }: IUploadWikiFileProps
                     alignContent: 'flex-start'
                 }}>
                     {fileList.length > 0 && fileList.map((item, index) => {
-                        return <FileItem>
+                        return <FileItem key={item.id || `${item.name}-${index}`}>
                             <span>{item.name}</span>
                             <span style={{
                                 marginLeft: 10
@@ -265,13 +270,16 @@ export default function UploadWikiFile({ id, onChagePath }: IUploadWikiFileProps
                     <div style={{
                         flex: '1'
                     }}>
-                        <Table dataSource={fileList.map(item => {
-                            return {
+                        <Table
+                            rowKey="key"
+                            dataSource={fileList.map((item, index) => ({
                                 fileName: item.name,
                                 progress: item.progress || 0,
-                                dataProgress: item.dataProgress || 0
-                            }
-                        })} columns={columns} />
+                                dataProgress: item.dataProgress || 0,
+                                key: `${item.id || item.name}-${index}`
+                            }))}
+                            columns={columns}
+                        />
                         <Button type='primary' onClick={() => {
                         saveFile();}} style={{
                             float: 'right',
