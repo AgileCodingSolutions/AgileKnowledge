@@ -74,7 +74,6 @@ export default memo(() => {
 
         setTab(key);
     }
-
     return (
 <>
             <LeftTabs>
@@ -83,13 +82,19 @@ export default memo(() => {
                     marginBottom: 16,
                     marginTop: 16,
                 }}>
-                    <Avatar size={50}
+                    {
+                        application.icon&&
+                        <Avatar size={50}
                         style={{
                             margin: '0 auto',
                             display: 'block',
                             marginBottom: 16
                         }}
-                        src={config.FAST_API_URL+'/'+application.icon} />
+                         src={config.FAST_API_URL+'/'+application.icon} 
+                        />
+                    }
+                    
+                        
                     <div style={{
                         fontSize: 18,
                         overflow: 'hidden',
@@ -134,7 +139,7 @@ export default memo(() => {
                                     title={
                                         <>
                                             <span>{index}：</span>
-                                            <span>{item.fileName}</span>
+                                            <span>{item.file.Name}</span>
                                             <Tag style={{float: 'right'
                                             }}>量化中</Tag>
                                         </>

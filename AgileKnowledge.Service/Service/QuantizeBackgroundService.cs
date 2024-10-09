@@ -109,7 +109,7 @@ namespace AgileKnowledge.Service.Service
 					serverless.Orchestrator.AddHandler<GenerateEmbeddingsHandler>("generate_embeddings");
 					serverless.Orchestrator.AddHandler<SaveRecordsHandler>("save_memory_records");
 					step.Add("extract_text");
-					//step.Add(stepName);
+					step.Add(stepName);
 					step.Add("generate_embeddings");
 					step.Add("save_memory_records");
 				}
@@ -117,11 +117,15 @@ namespace AgileKnowledge.Service.Service
 				string result = string.Empty;
 				if (knowledgeBaseDetails.File.Type == "file")
 				{
-					var fileInfoQuery = knowledgeBaseDetails.File;
+                    var fileInfoQuery = knowledgeBaseDetails.File;
+                    
                     var currentDirectory = Directory.GetCurrentDirectory();
-					var path = Path.Combine(currentDirectory, "wwwroot", fileInfoQuery.Path);
+                    var wwwrootPath = Path.Combine(currentDirectory, "wwwroot").Replace(Path.DirectorySeparatorChar, '/');
 
+                    
+                    var relativePath = fileInfoQuery.Path;
 
+                    var path = Path.Combine(wwwrootPath+ '/' + relativePath.TrimStart(Path.DirectorySeparatorChar));
                     result = await serverless.ImportDocumentAsync(path,
 						knowledgeBaseDetails.Id.ToString(),
 						tags: new TagCollection()

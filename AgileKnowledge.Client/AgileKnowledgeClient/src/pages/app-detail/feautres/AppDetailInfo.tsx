@@ -50,7 +50,7 @@ const AppDetailInfo = memo(({ value }: IAppDetailInfoProps) => {
         getModels()
             .then((models) => {
                 setSelectChatModel(models.chatModel.map((item) => {
-                    return { label: item.label, value: item.value }
+                    return { label: item.value, value: item.label }
                 }));
             });
         loadingWiki();
@@ -81,7 +81,7 @@ const AppDetailInfo = memo(({ value }: IAppDetailInfoProps) => {
             opener: application.opener,
             knowledgeIds: application.knowledgeIds
         });
-
+        
         chatApplicationService.update(updateData).then(() => {
             message.success('保存成功');
         });
@@ -107,6 +107,7 @@ const AppDetailInfo = memo(({ value }: IAppDetailInfoProps) => {
                     options={selectChatModel}
                 />
             </ListItem>
+
 
             <ListItem>
                 <span style={{
@@ -174,9 +175,12 @@ const AppDetailInfo = memo(({ value }: IAppDetailInfoProps) => {
                         ...application,
                         knowledgeIds: v
                     });
+                    //console.log('Updated application:', application);
                 }}
                 options={KnowledgeBases.map((item) => {
+                    
                     return {
+
                         label: item.name,
                         value: item.id
                     }

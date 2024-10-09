@@ -144,7 +144,7 @@ export default function FastChatInput({
             } else {
                 url = '/v1/chat/completions?chatId=' + application.id + "&chatDialogId=" + dialog.id;
             }
-            console.log(application.id, 11111111,dialog.id)
+            //console.log(application.id, 11111111,dialog.id)
             let stream = await fetchRaw(url, requestInput);
 
             for await (const chunk of stream) {

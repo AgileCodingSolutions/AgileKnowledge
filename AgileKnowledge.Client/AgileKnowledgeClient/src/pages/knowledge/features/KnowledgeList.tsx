@@ -75,7 +75,7 @@ export function AppList(props: IAppListProps) {
     async function loadingData() {
         try {
             const data = await knowledgeService.getList(input.keyword,"", input.page, input.pageSize);
-            console.log(data);
+            
             setData(data.items!);
             setTotal(data.totalCount!);
         } catch (error) {

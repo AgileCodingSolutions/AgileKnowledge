@@ -44,7 +44,7 @@ export default function WikiInfo(props: IWikiInfoProps) {
         getModels()
             .then((models) => {
                 setModel(models.chatModel.map((item) => {
-                    return { label: item.label, value: item.value }
+                    return { label: item.value, value: item.label }
                 }));
 
                 setEmbeddingModel(models.embeddingModel.map((item) => {

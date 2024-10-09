@@ -96,7 +96,7 @@ namespace AgileKnowledge.Service.Domain
 				entity.HasOne<KnowledgeBase>(x => x.KnowledgeBase).WithMany(x => x.KnowledgeBaseDetails).IsRequired();
 				entity.HasOne<FileStorage>(x => x.File).WithMany();
 			});
-
+			
 			modelBuilder.Entity<ChatApplication>(entity =>
 			{
 				entity.ToTable("Application","chat");

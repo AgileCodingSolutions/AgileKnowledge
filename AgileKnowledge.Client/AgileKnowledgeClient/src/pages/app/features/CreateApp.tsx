@@ -15,6 +15,15 @@ type CreateAppType = {
 export function CreateApp(props: ICreateAppProps) {
 
     const formRef = useRef<FormInstance>(null);
+
+
+    const resetFields = () =>{
+        props.onClose();
+        if (formRef.current) {
+            formRef.current.resetFields();
+        }
+    }
+
     var chatApplicationService = new ChatApplicationService();
 
     async function onFinish(values: any) {
@@ -38,7 +47,7 @@ export function CreateApp(props: ICreateAppProps) {
         <Modal
             title="创建应用"
             open={props.visible}
-            onCancel={props.onClose}
+            onCancel={resetFields}
             width={400}
             footer={null}
         >

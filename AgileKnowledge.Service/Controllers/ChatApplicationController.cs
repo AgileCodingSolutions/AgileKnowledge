@@ -52,10 +52,22 @@ namespace AgileKnowledge.Service.Controllers
 		[HttpGet]
 		public async Task<ChatApplicationDto> GetAsync(Guid id)
 		{
-			var entity = await _dbContext.ChatApplications.Where(x => x.Id == id).FirstOrDefaultAsync();
+			var entity = await _dbContext.ChatApplications.Where(x => x.Id == id)
+				.Include(x => x.KnowledgeBases).FirstOrDefaultAsync();
 
-			return _mapper.Map<ChatApplicationDto>(entity);
-		}
+            List<Guid> ids = new List<Guid>();
+            if (entity!=null) 
+			{
+                foreach (var item in entity.KnowledgeBases)
+                {
+					ids.Add(item.Id);
+                }
+            }
+	
+            var dto = _mapper.Map<ChatApplicationDto>(entity) ;
+			dto.KnowledgeIds = ids;
+			return dto;
+        }
 
 		[HttpPost]
 		public async Task CreateAsync([FromBody] CreateChatApplicationInputDto input)
@@ -80,7 +92,7 @@ namespace AgileKnowledge.Service.Controllers
 			entity.Opener = input.Opener;
 			entity.KnowledgeBases =
 				await _dbContext.KnowledgeBases.Where(x => input.KnowledgeIds.Contains(x.Id)).ToListAsync();
-
+			
 			_dbContext.Update(entity);
 			await _dbContext.SaveChangesAsync();
 		}

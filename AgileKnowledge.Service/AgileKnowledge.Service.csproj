@@ -13,6 +13,7 @@
     <Content Remove="wwwroot\uploads\20240927\8e6da0b33c1241fd9dd9daa28c7cc12aaaaa.txt" />
     <Content Remove="wwwroot\uploads\20240927\cf7c010167ee47c59e52e473545d36cfaaaa.txt" />
     <Content Remove="wwwroot\uploads\20240927\faec1584f60e44798568e29889338143一些软件的账户和密码.txt" />
+    <Content Remove="wwwroot\uploads\20241008\d77218e7bb82421b98ec0d296cf25e21aaaa.txt" />
   </ItemGroup>
 
   <ItemGroup>

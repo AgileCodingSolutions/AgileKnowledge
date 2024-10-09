@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react';
 import {  KnowledgeService } from '../../../services/service-proxies';
 
 import { KnowledgeBaseQuantizationState } from '../../../services/service-proxies';
-//import WikiDetailFile from '../features/WikiDetailFile'
+import DetailFile from '../features/DetailFile'
 interface IWikiDataProps {
     id: string;
     onChagePath(key: string): void;
@@ -175,14 +175,11 @@ var knowledgeService = new KnowledgeService();
 
     function handleDoubleClick(item: any) {
         item.isedit = true;
-        // 修改更新
         setData([...data]);
     }
     async function RemoveDeleteWikiDetails(id: string) {
         try {
             await  knowledgeService.deleteDetails(id);
-
-            console.log(id,222222222)
             message.success('删除成功');
             setInput({
                 ...input,
@@ -195,8 +192,8 @@ var knowledgeService = new KnowledgeService();
 
     async function onRetryVectorDetail(item: any) {
         try {
-
-            //await RetryVectorDetail(item.id);
+            
+            await knowledgeService.retryVectorDetail(item.id);
             message.success('成功');
             loadingData()
         } catch (error) {
@@ -218,12 +215,8 @@ var knowledgeService = new KnowledgeService();
     async function loadingData() {
         try {
             const result = await knowledgeService.getDetailsList(id, input.state, input.filter ,input.keyword, input.page, input.pageSize);
-
-            // const files = result.items ? result.items.map(item => item.file) : [];
-
             setData(result.items!);
             setTotal(result.totalCount!);
-            //console.log(result.totalCount!,33333)
         } catch (error) {
                  
         }
@@ -248,25 +241,27 @@ var knowledgeService = new KnowledgeService();
                 </Dropdown>
             </div>
             <Select
-                defaultValue={null}
-                style={{
-                    width: 120,
-                    marginLeft: 16,
-                    marginRight: 16,
-                    float: 'right'
-                }}
-                onChange={(v: KnowledgeBaseQuantizationState | undefined) => {
-                    setInput({
-                        ...input,
-                        state: v
-                    })
-                }}
-                options={[
-                    { value: null, label: '全部' },
-                    { value: KnowledgeBaseQuantizationState._0, label: '处理中' },
-                    { value: KnowledgeBaseQuantizationState._1, label: '完成' },
-                    { value: KnowledgeBaseQuantizationState._2, label: '失败' },
-                ]}
+                    value={input.state !== undefined ? input.state.toString() : ''}
+                    style={{
+                        width: 120,
+                        marginLeft: 16,
+                        marginRight: 16,
+                        float: 'right'
+                    }}
+                    onChange={(v) => {
+                        setInput({
+                            ...input,
+                            state: v === '' ? undefined : parseInt(v) as KnowledgeBaseQuantizationState,
+                            page: 1,
+                        });
+                        loadingData();
+                    }}
+                    options={[
+                        { value: "", label: '全部' },
+                        { value: KnowledgeBaseQuantizationState._0.toString(), label: '处理中' },
+                        { value: KnowledgeBaseQuantizationState._1.toString(), label: '完成' },
+                        { value: KnowledgeBaseQuantizationState._2.toString(), label: '失败' },
+                    ]}
             />
         </header>
         <Table
@@ -283,8 +278,8 @@ var knowledgeService = new KnowledgeService();
         style={{ overflow: 'auto', padding: 16, borderRadius: 8 }}
       />
             
-        {/* <WikiDetailFile onClose={() => {
+        <DetailFile onClose={() => {
             setVisible(false);
-        }} wikiDetail={openItem} visible={visible} /> */}
+        }} wikiDetail={openItem} visible={visible} />
     </>)
 }

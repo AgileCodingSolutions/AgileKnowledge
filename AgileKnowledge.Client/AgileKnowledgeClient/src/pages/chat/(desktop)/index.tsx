@@ -79,7 +79,7 @@ export default function DesktopLayout() {
                 return;
             }
             setApplication(result.items![0]);
-            //console.log(result.items![0])
+            
         } catch (error) {
 
         }
@@ -93,7 +93,7 @@ export default function DesktopLayout() {
 
             const result = (await chatApplicationService.getChatDialog(application.id));
             setDialogs(result);
-            console.log(result,application.id)
+            
                 //loadingDialogs();
             if(result.length === 0){
                 setDialogs([{
@@ -115,9 +115,9 @@ export default function DesktopLayout() {
             if (dialog.id === undefined) {
                 return;
             }
-            //console.log('advddsv' ,dialog.chatDialogId)
+            
             const result = await chatApplicationService.getChatDialogHistory(dialog.id,'','',input.page,input.pageSize);
-            //console.log(result)
+            
             const history = result.items!.map((item: any) => {
                 return {
                     content: item.content,
@@ -135,7 +135,7 @@ export default function DesktopLayout() {
             });
             
             setHistory(history);
-            //console.log(history,333)
+            
             // 等待1秒后滚动到底部
             setTimeout(() => {
                 const chatlayout = document.getElementById('chat-layout');
@@ -175,7 +175,7 @@ export default function DesktopLayout() {
     async function deleteDialog(id: string) {
         try {
             if(id === undefined){
-                console.log(id+'aaaaa')
+                
                   message.success('默认对话不能删除');
                   return;
               }

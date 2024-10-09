@@ -160,7 +160,7 @@ namespace AgileKnowledge.Service.Controllers
 
 
 	    [HttpGet]
-		public async Task<PagedResultDto<KnowledgeBaseDetailVectorQuantityDto>> GetDetailVectorQuantityAsync(KnowledgeBaseDetailsVectorQuantityInputDto input)
+		public async Task<PagedResultDto<KnowledgeBaseDetailVectorQuantityDto>> GetDetailVectorQuantityAsync([FromQuery] KnowledgeBaseDetailsVectorQuantityInputDto input)
 		{
 
 			var memoryServerless = _memoryService.CreateMemoryServerless();
@@ -285,6 +285,10 @@ namespace AgileKnowledge.Service.Controllers
 
 			var wikiDetail = await _dbContext.KnowledgeBaseDetails.Where(x => x.Id == knowledgeBaseDetailsId)
 				.FirstOrDefaultAsync();
+			if (wikiDetail==null) 
+			{
+				throw new Exception();
+			}
 			await QuantizeBackgroundService.AddKnowledgeBaseDetailAsync(wikiDetail);
 		}
 

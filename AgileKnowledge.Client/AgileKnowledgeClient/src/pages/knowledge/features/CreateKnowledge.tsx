@@ -27,6 +27,13 @@ export function CreateApp(props: ICreateAppProps) {
     const [fileList, setFileList] = useState([] as any[]);
     const formRef = useRef<FormInstance>(null);
 
+    const resetFields = () =>{
+        props.onClose();
+        if (formRef.current) {
+            formRef.current.resetFields();
+        }
+    }
+
     var knowledgeService = new KnowledgeService();
     const handleCancel = () => setPreviewVisible(false);
 
@@ -34,14 +41,14 @@ export function CreateApp(props: ICreateAppProps) {
         if (!file.url && !file.preview) {
             file.preview = await getBase64(file.originFileObj);
         }
-
+        
         setPreviewImage(file.url || file.preview);
         setPreviewVisible(true);
         setPreviewTitle(
             file.name || file.url.substring(file.url.lastIndexOf("/") + 1)
         );
     };
-
+    
     const handleChange = ({ fileList }: any) => setFileList(fileList);
 
     const getBase64 = (file: any) => {
@@ -59,7 +66,7 @@ export function CreateApp(props: ICreateAppProps) {
             .then((models) => {
                 setModel(models.chatModel.map((item) => {
                     
-                    return { label: item.label, value: item.value }
+                    return { label: item.value, value: item.label }
                 }));
                 setEmbeddingModel(models.embeddingModel.map((item) => {
                     return { label: item.label, value: item.value }
@@ -75,9 +82,7 @@ export function CreateApp(props: ICreateAppProps) {
                 return message.error('请上传头像');
             }
             const response = await UploadFile(fileList[0].originFileObj)
-            //debugger;
             values.icon = response.path;
-            //debugger;
             await knowledgeService.create(values);
             message.success('创建成功');
             props.onSuccess();
@@ -99,7 +104,7 @@ export function CreateApp(props: ICreateAppProps) {
         <Modal
             title="创建知识库"
             open={props.visible}
-            onCancel={props.onClose}
+            onCancel={resetFields}
             width={400}
             footer={null}
         >
